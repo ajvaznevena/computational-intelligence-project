@@ -120,5 +120,6 @@ env.bak/
 venv.bak/
 pip-selfcheck.json
 ri_projekat/
+.idea/
 
 # End of https://www.gitignore.io/api/venv,python

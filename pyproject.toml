@@ -6,6 +6,8 @@ authors = ["popovic-olivera <mi16064@alas.matf.bg.ac.rs>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
+pygame = "^1.9.6"
+pgzero = "^1.2"
 
 [tool.poetry.dev-dependencies]
 
