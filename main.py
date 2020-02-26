@@ -1,15 +1,16 @@
+from datetime import datetime
+
 import pgzrun
-import pygame
 from pgzero.animation import animate
 from pgzero.builtins import Actor
-import maps
+
 import key_input
+import maps
 
 WIDTH = 600
 HEIGHT = 580
 SPEED = 3
 
-# Player
 player = Actor('pacman_eat')
 
 
@@ -28,7 +29,9 @@ def update():
             maps.checkMovePoint(player)
             if player.movex or player.movey:
                 player.inputEnabled = False
-                animate(player, pos=(player.x + player.movex, player.y + player.movey), duration=1/3, tween='linear', on_finished=inputEnable)
+                animate(player, pos=(player.x + player.movex, player.y + player.movey),
+                        duration=1/SPEED, tween='linear', on_finished=inputEnable)
+
 
 def initPlayer():
     inputEnable()
@@ -39,13 +42,30 @@ def initPlayer():
     player.movex = player.movey = 0
     player.angle = 0
 
+
 def inputEnable():
     global player
+    player.movex = player.movey = 0
     player.inputEnabled = True
 
 
 def getPlayerImage():
-    pass
+    global player
+    dt = datetime.now()
+    a = player.angle
+    tc = dt.microsecond % (500000 / SPEED) / (100000 / SPEED)
+    if tc > 2.5 and (player.movex != 0 or player.movey != 0):
+        if a != 180:
+            player.image = "pacman"
+        else:
+            player.image = "pacman_r"
+    else:
+        if a != 180:
+            player.image = "pacman_eat"
+        else:
+            player.image = "pacman_eat_r"
+    player.angle = a
+
 
 def init():
     initPlayer()
