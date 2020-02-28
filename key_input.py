@@ -6,19 +6,19 @@ def checkInput(player):
     if player.gameStatus == 0:
         if key.get_pressed()[K_LEFT]:
             player.angle = 180
-            player.movex = -10
+            player.movex = -15
 
         if key.get_pressed()[K_RIGHT]:
             player.angle = 0
-            player.movex = 10
+            player.movex = 15
 
         if key.get_pressed()[K_UP]:
             player.angle = 90
-            player.movey = -10
+            player.movey = -15
 
         if key.get_pressed()[K_DOWN]:
             player.angle = 270
-            player.movey = 10
+            player.movey = 15
 
     elif player.gameStatus == 1:
         if key.get_pressed()[K_SPACE]:

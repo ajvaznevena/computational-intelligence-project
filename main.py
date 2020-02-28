@@ -12,13 +12,30 @@ HEIGHT = 580
 SPEED = 3
 
 player = Actor('pacman_eat')
-
+dots = []
+ghosts = []
 
 def draw():
+    global dots, ghosts
+
     screen.clear()
     screen.blit('colour_map', (0,0))
     player.draw()
     getPlayerImage()
+
+    # drawing dots
+    for d in dots:
+        if d.collidepoint((player.x, player.y)):
+            sounds.pacman_eat.play()
+            player.score += 10
+            dots.remove(d)
+            break
+    for d in dots:
+        d.draw()
+
+    # drawing ghosts
+    for g in ghosts:
+        g.draw()
 
 
 def update():
@@ -67,10 +84,36 @@ def getPlayerImage():
     player.angle = a
 
 
+def initDots():
+    global dots
+
+    for i in range(30):
+        for j in range(29):
+            color = maps.checkDotPoint(10 + i*20, 10 + j*20)
+            if color == 1:
+                dot = Actor("dot", (10 + i*20, 10 + j*20))
+                dot.type = 1
+                dots.append(dot)
+
+            elif color == 2:
+                dot = Actor("power", (10 + i*20, 10 + j*20))
+                dot.type = 2
+                dots.append(dot)
+
+
+def initGhosts():
+    global ghosts
+
+    for i in range(4):
+        ghost = Actor("ghost"  + str(i+1), (270+i*20 , 290))
+        ghosts.append(ghost)
+
 def init():
     initPlayer()
     music.play('background_music')
     music.set_volume(0.3)
+    initDots()
+    initGhosts()
 
 
 init()
