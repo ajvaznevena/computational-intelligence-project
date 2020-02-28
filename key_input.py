@@ -1,24 +1,26 @@
 from pygame import key
 from pygame.locals import *
 
+MOVEX = 15
+MOVEY = 10
 
 def checkInput(player):
     if player.gameStatus == 0:
         if key.get_pressed()[K_LEFT]:
             player.angle = 180
-            player.movex = -15
+            player.movex = -MOVEX
 
         if key.get_pressed()[K_RIGHT]:
             player.angle = 0
-            player.movex = 15
+            player.movex = MOVEX
 
         if key.get_pressed()[K_UP]:
             player.angle = 90
-            player.movey = -15
+            player.movey = -MOVEY
 
         if key.get_pressed()[K_DOWN]:
             player.angle = 270
-            player.movey = 15
+            player.movey = MOVEY
 
     elif player.gameStatus == 1:
         if key.get_pressed()[K_SPACE]:

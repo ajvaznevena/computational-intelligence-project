@@ -37,6 +37,12 @@ def draw():
     for g in ghosts:
         g.draw()
 
+    # colliding ghost-pacman check
+    for g in ghosts:
+        # if caught(g):
+            # print("OP!")
+        print(maps.getDirections(g))
+
 
 def update():
     global player
@@ -99,6 +105,13 @@ def initDots():
                 dot = Actor("power", (10 + i*20, 10 + j*20))
                 dot.type = 2
                 dots.append(dot)
+
+
+def caught(ghost):
+    if player.collidepoint((ghost.x, ghost.y)):
+        return True
+    else:
+        return False
 
 
 def initGhosts():
