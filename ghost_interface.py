@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class AlgorithmInterface(ABC):
 
     @abstractmethod
@@ -7,7 +8,7 @@ class AlgorithmInterface(ABC):
         pass
 
 
-class Node():
+class Node:
     def __init__(self, value, point):
         self.value = value
         self.point = point
@@ -19,14 +20,12 @@ class Node():
         return 0 if self.value == '.' else 1
 
 
-
 class AStar(AlgorithmInterface):
 
     def __init__(self, start, goal, grid):
         self.start = start
         self.goal = goal
         self.grid = grid
-
 
     def aStar(self, start, goal, grid):
         openset = set()
@@ -59,16 +58,13 @@ class AStar(AlgorithmInterface):
                     node.parent = current
                     openset.add(node)
 
-
     def manhattan(self, node, goal):
         return abs(node.point[0] - goal.point[0]) + abs(node.point[1]-goal.point[1])
-
 
     def children(self, point, grid):
         x, y = point.point
         links = [grid[d[0]][d[1]] for d in [(x - 1, y), (x, y - 1), (x, y + 1), (x + 1, y)]]
         return [link for link in links if link.value != 'x']
-
 
     def getNextStep(self, ghost, player, grid):
         for x in range(len(grid)):

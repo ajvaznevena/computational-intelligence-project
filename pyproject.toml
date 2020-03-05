@@ -8,6 +8,9 @@ authors = ["popovic-olivera <mi16064@alas.matf.bg.ac.rs>"]
 python = "^3.6"
 pygame = "^1.9.6"
 pgzero = "^1.2"
+conv = "^0.2"
+matplotlib = "^3.2.0"
+pillow = "^7.0.0"
 
 [tool.poetry.dev-dependencies]
 

@@ -2,25 +2,14 @@ from datetime import datetime
 
 import pgzrun
 from pgzero.animation import animate
-from pgzero.builtins import Actor
 
 import key_input
 import maps
 import ghost_interface
+from game_config import *
 
-WIDTH = 600
-HEIGHT = 580
-SPEED = 3
-CELLS_PER_INT = 30
-
-player = Actor('pacman_eat')
-dots = []   # list of all dots on screen
-ghosts = [] # list of all four ghosts on screen
-grid = [[0 for i in range(HEIGHT)] for j in range(WIDTH)] # grid
 
 def draw():
-    global dots, ghosts
-
     screen.clear()
     screen.blit('colour_map', (0, 0))
 
@@ -63,6 +52,7 @@ def draw():
     # graph()
     moveGhosts()
 
+
 def drawCentreText(msg):
     screen.draw.text(msg, center=(300, 300), owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
 
@@ -70,8 +60,8 @@ def drawCentreText(msg):
 def drawGraph(i, j):
     screen.draw.text("X", center=(i*CELLS_PER_INT, j*CELLS_PER_INT), color="red")
 
+
 def update():
-    global player
     if player.gameStatus == 0:
         if player.inputEnabled:
             key_input.checkInput(player)
@@ -99,8 +89,6 @@ def update():
 
 
 def getPlayerImage():
-    global player
-
     dt = datetime.now()
     a = player.angle
     tc = dt.microsecond % (500000 / SPEED) / (100000 / SPEED)
@@ -146,15 +134,11 @@ def initPlayer():
 
 
 def inputEnable():
-    global player
-
     player.movex = player.movey = 0
     player.inputEnabled = True
 
 
 def initDots():
-    global dots
-
     for i in range(30):
         for j in range(29):
             color = maps.checkDotPoint(10 + i*20, 10 + j*20)
@@ -171,8 +155,6 @@ def initDots():
 
 
 def initGhosts():
-    global ghosts
-
     for i in range(4):
         ghost = Actor("ghost" + str(i+1), (270 + i*20, 290))
         ghosts.append(ghost)
@@ -180,9 +162,7 @@ def initGhosts():
 
 
 def moveGhosts():
-    global ghosts
-    global grid
-
+    pass
     # for g in ghosts:
     #     p = ghost_interface.AStar(g, player, grid)
     #     xn, yn = p.getNextStep(g, player, grid)
@@ -190,12 +170,13 @@ def moveGhosts():
     #     g.y = yn
     #     g.draw()
 
+
 def graph():
-    global grid
     for i in range(WIDTH):
         for j in range(HEIGHT):
             drawGraph(i, j)
-            grid[i][j] = (i,j)
+            grid[i, j] = (i, j)
+
 
 init()
 pgzrun.go()
