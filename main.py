@@ -6,15 +6,17 @@ from pgzero.builtins import Actor
 
 import key_input
 import maps
+import ghost_interface
 
 WIDTH = 600
 HEIGHT = 580
 SPEED = 3
+CELLS_PER_INT = 30
 
 player = Actor('pacman_eat')
 dots = []   # list of all dots on screen
 ghosts = [] # list of all four ghosts on screen
-
+grid = [[0 for i in range(HEIGHT)] for j in range(WIDTH)] # grid
 
 def draw():
     global dots, ghosts
@@ -58,10 +60,15 @@ def draw():
         drawCentreText("CAUGHT!\nPress Space\nto Continue")
         sounds.pacman_death.play()
 
+    # graph()
+    moveGhosts()
 
 def drawCentreText(msg):
     screen.draw.text(msg, center=(300, 300), owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
 
+
+def drawGraph(i, j):
+    screen.draw.text("X", center=(i*CELLS_PER_INT, j*CELLS_PER_INT), color="red")
 
 def update():
     global player
@@ -169,7 +176,26 @@ def initGhosts():
     for i in range(4):
         ghost = Actor("ghost" + str(i+1), (270 + i*20, 290))
         ghosts.append(ghost)
+        ghost_interface.AStar(ghost, graph, player)
 
+
+def moveGhosts():
+    global ghosts
+    global grid
+
+    # for g in ghosts:
+    #     p = ghost_interface.AStar(g, player, grid)
+    #     xn, yn = p.getNextStep(g, player, grid)
+    #     g.x = xn
+    #     g.y = yn
+    #     g.draw()
+
+def graph():
+    global grid
+    for i in range(WIDTH):
+        for j in range(HEIGHT):
+            drawGraph(i, j)
+            grid[i][j] = (i,j)
 
 init()
 pgzrun.go()
