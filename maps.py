@@ -10,10 +10,10 @@ def checkMovePoint(player):
     global moveImage
 
     if player.x + player.movex < 0:
-        player.x = 600
+        player.x = 590
 
     if player.x + player.movex >= 600:
-        player.x = 0
+        player.x = 10
 
     if moveImage.get_at((int(player.x + player.movex), int(player.y + player.movey))) != Color('black'):
         player.movex = player.movey = 0

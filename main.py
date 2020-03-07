@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pgzrun
+import sys
 from pgzero.animation import animate
 
 import key_input
@@ -49,8 +50,7 @@ def draw():
         drawCentreText("CAUGHT!\nPress Space\nto Continue")
         sounds.pacman_death.play()
 
-    # graph()
-    moveGhosts()
+    # moveGhosts()  # TODO
 
 
 def drawCentreText(msg):
@@ -158,25 +158,26 @@ def initGhosts():
     for i in range(4):
         ghost = Actor("ghost" + str(i+1), (270 + i*20, 290))
         ghosts.append(ghost)
-        ghost_interface.AStar(ghost, graph, player)
+
+        # depending on which algorithm user selected ghosts algorithm is being initialised
+        if algorithm == 'A*':
+            ghost.algorithm = ghost_interface.AStar(ghost, player, grid)    # TODO
+        else:
+            print("Bad algorithm chosen, try again :(")
+            sys.exit(1)
 
 
 def moveGhosts():
-    pass
-    # for g in ghosts:
-    #     p = ghost_interface.AStar(g, player, grid)
-    #     xn, yn = p.getNextStep(g, player, grid)
-    #     g.x = xn
-    #     g.y = yn
-    #     g.draw()
+    for g in ghosts:
+        # because all algorithms implement the same interface we can call getNextStep
+        xn, yn = g.algorithm.getNextStep(g, player, grid)   # TODO
+        g.x = xn
+        g.y = yn
+        g.draw()
 
 
-def graph():
-    for i in range(WIDTH):
-        for j in range(HEIGHT):
-            drawGraph(i, j)
-            grid[i, j] = (i, j)
-
-
+# TODO da ne smara svaki put, za sad imamo samo A* pa ne mora da se unosi :D
+algorithm = 'A*'
+# algorithm = input("Enter which algorithm to use for ghosts: ")
 init()
 pgzrun.go()
