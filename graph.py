@@ -14,22 +14,29 @@ def get_adjacency_list():
     rows, columns = grid.shape
 
     for i in range(rows):
-        for j in range(rows):
-            if not grid[i, j]:
+        for j in range(columns):
+            if grid[i,j] == 0:
                 continue
 
             node_name = get_node_name(i, j)
             adjacency_list[node_name] = []
 
             # get all directions in which user can move and initialize its cost to 1
-            if grid[i-1, j]:
-                adjacency_list[node_name].append((get_node_name(i-1, j), 1))
-            if grid[i, j-1]:
-                adjacency_list[node_name].append((get_node_name(i, j-1), 1))
-            if grid[i+1, j]:
-                adjacency_list[node_name].append((get_node_name(i+1, j), 1))
-            if grid[i, j+1]:
-                adjacency_list[node_name].append((get_node_name(i, j+1), 1))
+            if i > 0:
+                if grid[i-1, j]:
+                    adjacency_list[node_name].append((get_node_name(i-1, j), 1))
+
+            if j > 0:
+                if grid[i, j-1]:
+                    adjacency_list[node_name].append((get_node_name(i, j-1), 1))
+
+            if i < rows -1:
+                if grid[i+1, j]:
+                    adjacency_list[node_name].append((get_node_name(i+1, j), 1))
+
+            if j < columns -1:
+                if grid[i, j+1]:
+                    adjacency_list[node_name].append((get_node_name(i, j+1), 1))
 
     return adjacency_list
 

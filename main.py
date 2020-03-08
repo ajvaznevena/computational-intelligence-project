@@ -50,15 +50,10 @@ def draw():
         drawCentreText("CAUGHT!\nPress Space\nto Continue")
         sounds.pacman_death.play()
 
-    # moveGhosts()  # TODO
-
+    moveGhosts()
 
 def drawCentreText(msg):
     screen.draw.text(msg, center=(300, 300), owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
-
-
-def drawGraph(i, j):
-    screen.draw.text("X", center=(i*CELLS_PER_INT, j*CELLS_PER_INT), color="red")
 
 
 def update():
@@ -161,7 +156,7 @@ def initGhosts():
 
         # depending on which algorithm user selected ghosts algorithm is being initialised
         if algorithm == 'A*':
-            ghost.algorithm = ghost_interface.AStar(ghost, player, grid)    # TODO
+            ghost.algorithm = ghost_interface.AStar(ghost, player, graph, i+1, grid)
         else:
             print("Bad algorithm chosen, try again :(")
             sys.exit(1)
@@ -170,9 +165,12 @@ def initGhosts():
 def moveGhosts():
     for g in ghosts:
         # because all algorithms implement the same interface we can call getNextStep
-        xn, yn = g.algorithm.getNextStep(g, player, grid)   # TODO
-        g.x = xn
-        g.y = yn
+        node = g.algorithm.getNextStep()    # TODO
+
+        index = node.find('_')
+        g.x = float(node[1:index])
+        g.y = float(node[index + 1:])
+
         g.draw()
 
 
