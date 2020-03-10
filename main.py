@@ -40,24 +40,21 @@ def draw():
                 player.gameStatus = 1
 
     if player.lives == 0:
-        player.gameStatus = 3
+        player.gameStatus = 2
 
-    if player.gameStatus == 3:
-        drawCentreText("GAME OVER")
     if player.gameStatus == 2:
-        drawCentreText("LEVEL CLEARED!\nPress Space\nto Continue")
+        drawCentreText("GAME OVER")
     if player.gameStatus == 1:
         drawCentreText("CAUGHT!\nPress Space\nto Continue")
         sounds.pacman_death.play()
 
-    moveGhosts()
 
 def drawCentreText(msg):
     screen.draw.text(msg, center=(300, 300), owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
 
 
 def update():
-    if player.gameStatus == 0:
+    if player.gameStatus == 0:  # player is moving
         if player.inputEnabled:
             key_input.checkInput(player)
             maps.checkMovePoint(player)
@@ -66,8 +63,9 @@ def update():
                 player.inputEnabled = False
                 animate(player, pos=(player.x + player.movex, player.y + player.movey),
                         duration=1/SPEED, tween='linear', on_finished=inputEnable)
+                moveGhosts()
 
-    elif player.gameStatus == 1:
+    elif player.gameStatus == 1:    # player caught
         i = key_input.checkInput(player)
 
         if i == 1:
@@ -76,11 +74,14 @@ def update():
             player.y = 490
             player.angle = 0
 
+        return
+
     elif player.gameStatus == 2:
         i = key_input.checkInput(player)
 
         if i == 1:
-            init()
+            print("GAME OVER")
+            sys.exit(0)
 
 
 def getPlayerImage():
@@ -152,11 +153,13 @@ def initDots():
 def initGhosts():
     for i in range(4):
         ghost = Actor("ghost" + str(i+1), (270 + i*20, 290))
+        ghost.index = i+1
+        ghost.path = []
         ghosts.append(ghost)
 
         # depending on which algorithm user selected ghosts algorithm is being initialised
         if algorithm == 'A*':
-            ghost.algorithm = ghost_interface.AStar(ghost, player, graph, i+1, grid)
+            ghost.algorithm = ghost_interface.AStar(ghost)
         else:
             print("Bad algorithm chosen, try again :(")
             sys.exit(1)
@@ -165,11 +168,11 @@ def initGhosts():
 def moveGhosts():
     for g in ghosts:
         # because all algorithms implement the same interface we can call getNextStep
-        node = g.algorithm.getNextStep()    # TODO
+        node = g.algorithm.getNextStep()
 
         index = node.find('_')
-        g.x = float(node[1:index])
-        g.y = float(node[index + 1:])
+        g.x = int(node[index + 1:]) * 20 + 10
+        g.y = int(node[1:index])*20 + 10
 
         g.draw()
 

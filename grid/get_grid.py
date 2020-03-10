@@ -60,6 +60,13 @@ def run():
         br += 1
 
     grid = np.reshape(grid, (-1, 30))
+
+    # this has to be done by hand because fields are not all black but
+    # they are needed for ghosts to get out
+    grid[12, 14] = 1
+    grid[12, 15] = 1
+    grid[13, 14] = 1
+    grid[13, 15] = 1
     # print(grid)
 
     # save grid to a file 'grid.npy'
@@ -67,4 +74,4 @@ def run():
 
     # uncomment next two lines if you want to get grid as image
     # plt.imshow(grid)
-    # plt.savefig('grid_as_image.png')
+    # plt.savefig('grid/grid_as_image.png')
