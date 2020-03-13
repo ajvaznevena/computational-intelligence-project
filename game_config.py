@@ -14,3 +14,5 @@ dots = []       # list of all dots on screen
 ghosts = []     # list of all four ghosts on screen
 grid = np.array(get_grid())     # movement grid
 graph = create_graph()  # movement graph
+ghost_move = 0
+ITER = 20

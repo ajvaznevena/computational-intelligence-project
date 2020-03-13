@@ -9,6 +9,7 @@ import maps
 import ghost_interface
 from game_config import *
 
+pomoc = Actor("ghost5")
 
 def draw():
     screen.clear()
@@ -39,6 +40,13 @@ def draw():
             if caught(g):
                 player.gameStatus = 1
 
+        if g.index == 3 and g.path != []:
+            node = g.path[-1]
+            index = node.find('_')
+            pomoc.x = int(node[index + 1:]) * 20 + 10
+            pomoc.y = int(node[1:index]) * 20 + 10
+            pomoc.draw()
+
     if player.lives == 0:
         player.gameStatus = 2
 
@@ -49,11 +57,14 @@ def draw():
         sounds.pacman_death.play()
 
 
+
 def drawCentreText(msg):
     screen.draw.text(msg, center=(300, 300), owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
 
 
 def update():
+    global ghost_move
+
     if player.gameStatus == 0:  # player is moving
         if player.inputEnabled:
             key_input.checkInput(player)
@@ -63,7 +74,6 @@ def update():
                 player.inputEnabled = False
                 animate(player, pos=(player.x + player.movex, player.y + player.movey),
                         duration=1/SPEED, tween='linear', on_finished=inputEnable)
-                moveGhosts()
 
     elif player.gameStatus == 1:    # player caught
         i = key_input.checkInput(player)
@@ -82,6 +92,12 @@ def update():
         if i == 1:
             print("GAME OVER")
             sys.exit(0)
+
+    ghost_move += 1
+    if ghost_move == ITER:
+        if player.gameStatus != 1:
+            moveGhosts()
+        ghost_move = 0
 
 
 def getPlayerImage():
@@ -154,7 +170,10 @@ def initGhosts():
     for i in range(4):
         ghost = Actor("ghost" + str(i+1), (270 + i*20, 290))
         ghost.index = i+1
-        ghost.path = []
+        if i == 3:
+            ghost.path = ["n1_1"]
+        else:
+            ghost.path = []
         ghosts.append(ghost)
 
         # depending on which algorithm user selected ghosts algorithm is being initialised

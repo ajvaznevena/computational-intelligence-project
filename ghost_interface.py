@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import sys
+import random
 
 from game_config import *
 
@@ -75,21 +76,56 @@ class AStar(AlgorithmInterface):
     # TODO: implement different goals
     @staticmethod
     def get_goal(index):
-        # Blue ghost's goal is player (index = 1)
+        # Red ghost's goal is player (index = 1)
         if index == 1:
             return AStar.pixelToGrid((player.x, player.y))
 
-        # Lightblue ghost's goal is player (index = 2)
+        # Lightblue ghost's goal is 4 fiels ahead player's current postion (index = 2)
         elif index == 2:
-            return AStar.pixelToGrid((player.x, player.y))
+            return AStar.lightBlueGoal()
 
-        # Orange ghost's goal is player (index = 3)
+        # Orange ghost's goal is random node (index = 3)
         elif index == 3:
-            return AStar.pixelToGrid((player.x, player.y))
+            return AStar.orangeGoal()
 
         # Pink ghost's goal is player (index = 4)
         elif index == 4:
+            # return AStar.pinkGoal()
             return AStar.pixelToGrid((player.x, player.y))
+
+    @staticmethod
+    def lightBlueGoal():
+        targetx, targety = 0, 0
+
+        if (player.angle // 90) % 2 == 0:
+            targetx = -80 if player.movex < 0 else 80
+
+        else:
+            targety = -80 if player.movey < 0 else 80
+
+        tarx, tary = AStar.pixelToGrid((player.x + targetx, player.y + targety))
+
+        if 0 <= tarx < 29 and 0 <= tary < 30:
+            if not grid[tarx, tary]:
+                return AStar.pixelToGrid((player.x, player.y))
+            else:
+                return tarx, tary
+
+        return AStar.pixelToGrid((player.x, player.y))
+
+    @staticmethod
+    def orangeGoal():
+        nodesNo = len(graph.adjacency_list)
+        r = random.randrange(nodesNo)
+        goal = list(graph.adjacency_list.keys())[r]
+        xx = goal.find('_')
+        targetx = int(goal[1:xx])
+        targety = int(goal[xx + 1:])
+        return targetx, targety
+
+    @staticmethod
+    def pinkGoal():
+        pass
 
     @staticmethod
     def pixelToGrid(node):
@@ -109,7 +145,16 @@ class AStar(AlgorithmInterface):
         return abs(v_x - finish_x) + abs(v_y - finish_y)
 
     def getNextStep(self):
-        goal = self.pixelToGrid((player.x, player.y))
+        if self.ghost.index == 2:
+            goal = AStar.lightBlueGoal()
+        if self.ghost.index == 3:
+            if self.ghost.path == []:
+                goal = AStar.orangeGoal()
+            else:
+                goal = self.ghost.path[-1]
+
+        else:
+            goal = AStar.pixelToGrid((player.x, player.y))
         goalNameKey = "n" + str(goal[0]) + "_" + str(goal[1])
 
         # if player did not move we don't need to calculate path again
