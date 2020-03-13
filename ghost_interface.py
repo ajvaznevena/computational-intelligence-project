@@ -20,10 +20,10 @@ class AStar(AlgorithmInterface):
     def run(self):
 
         start = AStar.pixelToGrid((self.ghost.x, self.ghost.y))
-        startNameKey = "n" + str(start[0]) + "_" + str(start[1])
+        startNameKey = AStar.getNodeName(start)
 
         goal = AStar.get_goal(self.ghost.index)
-        goalNameKey = "n" + str(goal[0]) + "_" + str(goal[1])
+        goalNameKey = AStar.getNodeName(goal)
 
         openset = set()
         openset.add(startNameKey)
@@ -80,7 +80,7 @@ class AStar(AlgorithmInterface):
         if index == 1:
             return AStar.pixelToGrid((player.x, player.y))
 
-        # Lightblue ghost's goal is 4 fiels ahead player's current postion (index = 2)
+        # Lightblue ghost's goal is 4 fields ahead player's current postion (index = 2)
         elif index == 2:
             return AStar.lightBlueGoal()
 
@@ -88,10 +88,9 @@ class AStar(AlgorithmInterface):
         elif index == 3:
             return AStar.orangeGoal()
 
-        # Pink ghost's goal is player (index = 4)
+        # Pink ghost's goal is 8 fields behind player's current postion (index = 4)
         elif index == 4:
-            # return AStar.pinkGoal()
-            return AStar.pixelToGrid((player.x, player.y))
+            return AStar.pinkGoal()
 
     @staticmethod
     def lightBlueGoal():
@@ -118,14 +117,28 @@ class AStar(AlgorithmInterface):
         nodesNo = len(graph.adjacency_list)
         r = random.randrange(nodesNo)
         goal = list(graph.adjacency_list.keys())[r]
-        xx = goal.find('_')
-        targetx = int(goal[1:xx])
-        targety = int(goal[xx + 1:])
-        return targetx, targety
+        return AStar.getCoordsFromName(goal)
 
     @staticmethod
     def pinkGoal():
-        pass
+        targetx, targety = 0, 0
+
+        if (player.angle // 90) % 2 == 0:
+            targetx = 160 if player.movex < 0 else -160
+
+        else:
+            targety = 160 if player.movey < 0 else -160
+
+        tarx, tary = AStar.pixelToGrid((player.x + targetx, player.y + targety))
+
+        if 0 <= tarx < 29 and 0 <= tary < 30:
+            if not grid[tarx, tary]:
+                return AStar.pixelToGrid((player.x, player.y))
+            else:
+                return tarx, tary
+
+        return AStar.pixelToGrid((player.x, player.y))
+
 
     @staticmethod
     def pixelToGrid(node):
@@ -134,28 +147,39 @@ class AStar(AlgorithmInterface):
 
     @staticmethod
     def manhattan(v_coords, goal):
-        xx = v_coords.find('_')
-        v_x = int(v_coords[1:xx])
-        v_y = int(v_coords[xx + 1:])
+        vX, vY = AStar.getCoordsFromName(v_coords)
+        finishX, finishY = AStar.getCoordsFromName(goal)
 
-        xx = goal.find('_')
-        finish_x = int(goal[1:xx])
-        finish_y = int(goal[xx + 1:])
+        return abs(vX - finishX) + abs(vY - finishY)
 
-        return abs(v_x - finish_x) + abs(v_y - finish_y)
+    @staticmethod
+    def getCoordsFromName(str):
+        index = str.find('_')
+        coordX = int(str[1:index])
+        coordY = int(str[index + 1:])
+
+        return coordX, coordY
+
+    @staticmethod
+    def getNodeName(node):
+        return "n" + str(node[0]) + "_" + str(node[1])
 
     def getNextStep(self):
+        goalNameKey = ""
+
         if self.ghost.index == 2:
             goal = AStar.lightBlueGoal()
-        if self.ghost.index == 3:
-            if self.ghost.path == []:
-                goal = AStar.orangeGoal()
-            else:
-                goal = self.ghost.path[-1]
+            goalNameKey = AStar.getNodeName(goal)
+        elif self.ghost.index == 3:
+            if self.ghost.path:
+                goal = AStar.getCoordsFromName(self.ghost.path[-1])
+                goalNameKey = AStar.getNodeName(goal)
+        elif self.ghost.index == 4:
+            goal = AStar.pinkGoal()
 
         else:
             goal = AStar.pixelToGrid((player.x, player.y))
-        goalNameKey = "n" + str(goal[0]) + "_" + str(goal[1])
+            goalNameKey = AStar.getNodeName(goal)
 
         # if player did not move we don't need to calculate path again
         # instead, we just give next node in calculated path
@@ -172,4 +196,7 @@ class AStar(AlgorithmInterface):
         else:
             self.ghost.path.pop(0)
 
-        return self.ghost.path[0]
+        if self.ghost.path == []:
+            return None
+        else:
+            return self.ghost.path[0]

@@ -9,7 +9,6 @@ import maps
 import ghost_interface
 from game_config import *
 
-pomoc = Actor("ghost5")
 
 def draw():
     screen.clear()
@@ -40,13 +39,6 @@ def draw():
             if caught(g):
                 player.gameStatus = 1
 
-        if g.index == 3 and g.path != []:
-            node = g.path[-1]
-            index = node.find('_')
-            pomoc.x = int(node[index + 1:]) * 20 + 10
-            pomoc.y = int(node[1:index]) * 20 + 10
-            pomoc.draw()
-
     if player.lives == 0:
         player.gameStatus = 2
 
@@ -55,7 +47,6 @@ def draw():
     if player.gameStatus == 1:
         drawCentreText("CAUGHT!\nPress Space\nto Continue")
         sounds.pacman_death.play()
-
 
 
 def drawCentreText(msg):
@@ -73,9 +64,9 @@ def update():
             if player.movex or player.movey:
                 player.inputEnabled = False
                 animate(player, pos=(player.x + player.movex, player.y + player.movey),
-                        duration=1/SPEED, tween='linear', on_finished=inputEnable)
+                        duration=1 / SPEED, tween='linear', on_finished=inputEnable)
 
-    elif player.gameStatus == 1:    # player caught
+    elif player.gameStatus == 1:  # player caught
         i = key_input.checkInput(player)
 
         if i == 1:
@@ -153,27 +144,28 @@ def inputEnable():
 def initDots():
     for i in range(30):
         for j in range(29):
-            color = maps.checkDotPoint(10 + i*20, 10 + j*20)
+            color = maps.checkDotPoint(10 + i * 20, 10 + j * 20)
 
             if color == 1:
-                dot = Actor("dot", (10 + i*20, 10 + j*20))
+                dot = Actor("dot", (10 + i * 20, 10 + j * 20))
                 dot.type = 1
                 dots.append(dot)
 
             elif color == 2:
-                dot = Actor("power", (10 + i*20, 10 + j*20))
+                dot = Actor("power", (10 + i * 20, 10 + j * 20))
                 dot.type = 2
                 dots.append(dot)
 
 
 def initGhosts():
     for i in range(4):
-        ghost = Actor("ghost" + str(i+1), (270 + i*20, 290))
-        ghost.index = i+1
-        if i == 3:
-            ghost.path = ["n1_1"]
-        else:
-            ghost.path = []
+        ghost = Actor("ghost" + str(i + 1), (270 + i * 20, 290))
+        ghost.index = i + 1
+        ghost.path = []
+
+        if i == 2:
+            ghost.path.append("n1_1")
+
         ghosts.append(ghost)
 
         # depending on which algorithm user selected ghosts algorithm is being initialised
@@ -188,10 +180,12 @@ def moveGhosts():
     for g in ghosts:
         # because all algorithms implement the same interface we can call getNextStep
         node = g.algorithm.getNextStep()
+        if node is None:
+            return
 
         index = node.find('_')
         g.x = int(node[index + 1:]) * 20 + 10
-        g.y = int(node[1:index])*20 + 10
+        g.y = int(node[1:index]) * 20 + 10
 
         g.draw()
 
