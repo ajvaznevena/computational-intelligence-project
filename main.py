@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 
 import pgzrun
 import sys
@@ -11,6 +12,7 @@ from game_config import *
 
 
 def draw():
+    global isChasingMode
     screen.clear()
     screen.blit('colour_map', (0, 0))
 
@@ -22,28 +24,47 @@ def draw():
     for d in dots:
         if d.collidepoint((player.x, player.y)):
             sounds.pacman_eat.play()
-            player.score += 10
-            dots.remove(d)
-            break
+            if d.type == 1:
+                player.score += 10
+                dots.remove(d)
+                break
+            else:
+                player.score += 20
+                dots.remove(d)
+                isChasingMode = True
+                # TODO implement timer without sleep function(by threads maybe?)
+                isChasingMode = False
 
     for d in dots:
         d.draw()
 
     if len(dots) == 0:
-        player.gameStatus = 2
+        player.gameStatus = 3
 
     # drawing ghosts
     for g in ghosts:
         g.draw()
         if player.gameStatus == 0:
             if caught(g):
-                player.gameStatus = 1
+                if not isChasingMode:
+                    player.gameStatus = 1
+
+    # drawing running ghosts
+    for g in runGhosts:
+        if player.collidepoint((g.x, g.y)):
+            g.x = 290
+            g.y = 290
+        g.draw()
 
     if player.lives == 0:
         player.gameStatus = 2
 
     if player.gameStatus == 2:
         drawCentreText("GAME OVER")
+
+    if player.gameStatus == 3:
+        drawCentreText("YOU WON")
+
     if player.gameStatus == 1:
         drawCentreText("CAUGHT!\nPress Space\nto Continue")
         sounds.pacman_death.play()
@@ -111,7 +132,8 @@ def getPlayerImage():
 
 def caught(ghost):
     if player.collidepoint((ghost.x, ghost.y)):
-        player.lives -= 1
+        if not isChasingMode:
+            player.lives -= 1
         return True
     else:
         return False
@@ -158,37 +180,51 @@ def initDots():
 
 
 def initGhosts():
-    for i in range(4):
-        ghost = Actor("ghost" + str(i + 1), (270 + i * 20, 290))
-        ghost.index = i + 1
-        ghost.path = []
+        for i in range(4):
+            ghost = Actor("ghost" + str(i + 1), (270 + i * 20, 290))
+            ghost.index = i + 1
+            ghost.path = []
 
-        if i == 2:
-            ghost.path.append("n1_1")
+            if i == 2:
+                ghost.path.append("n1_1")
 
-        ghosts.append(ghost)
+            ghosts.append(ghost)
 
-        # depending on which algorithm user selected ghosts algorithm is being initialised
-        if algorithm == 'A*':
-            ghost.algorithm = ghost_interface.AStar(ghost)
-        else:
-            print("Bad algorithm chosen, try again :(")
-            sys.exit(1)
+            # depending on which algorithm user selected ghosts algorithm is being initialised
+            if algorithm == 'A*':
+                ghost.algorithm = ghost_interface.AStar(ghost)
+            else:
+                print("Bad algorithm chosen, try again :(")
+                sys.exit(1)
 
 
 def moveGhosts():
-    for g in ghosts:
-        # because all algorithms implement the same interface we can call getNextStep
-        node = g.algorithm.getNextStep()
-        if node is None:
-            return
+    global isChasingMode
+    if not isChasingMode:
+        for g in ghosts:
+            # because all algorithms implement the same interface we can call getNextStep
+            node = g.algorithm.getNextStep()
+            if node is None:
+                return
 
-        index = node.find('_')
-        g.x = int(node[index + 1:]) * 20 + 10
-        g.y = int(node[1:index]) * 20 + 10
+            index = node.find('_')
+            g.x = int(node[index + 1:]) * 20 + 10
+            g.y = int(node[1:index]) * 20 + 10
 
-        g.draw()
+            g.draw()
 
+    else:
+        for i in range(4):
+            ghost = Actor("ghost5", (ghosts[i].x, ghosts[i].y))
+            ghost.path = []
+            runGhosts.append(ghost)
+
+        for g in runGhosts:
+            for ghost in ghosts:
+                ghost.x = g.x
+                ghost.y = g.y
+                # TODO (debug) pink ghost doesn't change position!
+            g.draw()
 
 # TODO da ne smara svaki put, za sad imamo samo A* pa ne mora da se unosi :D
 algorithm = 'A*'

@@ -73,7 +73,6 @@ class AStar(AlgorithmInterface):
         print("Path doesn't exist")
         return None
 
-    # TODO: implement different goals
     @staticmethod
     def get_goal(index):
         # Red ghost's goal is player (index = 1)
