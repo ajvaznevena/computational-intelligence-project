@@ -1,5 +1,6 @@
 from datetime import datetime
 import time
+import threading
 
 import pgzrun
 import sys
@@ -13,6 +14,7 @@ from game_config import *
 
 def draw():
     global isChasingMode
+    global isInitialized
     screen.clear()
     screen.blit('colour_map', (0, 0))
 
@@ -32,8 +34,10 @@ def draw():
                 player.score += 20
                 dots.remove(d)
                 isChasingMode = True
-                # TODO implement timer without sleep function(by threads maybe?)
-                isChasingMode = False
+                if not isInitialized:
+                    initRunningGhosts()
+                isInitialized = True
+                measureTime()
 
     for d in dots:
         d.draw()
@@ -69,6 +73,15 @@ def draw():
         drawCentreText("CAUGHT!\nPress Space\nto Continue")
         sounds.pacman_death.play()
 
+def measureTime():
+    thread1 = threading.Thread(target=timer)
+    thread1.start()
+
+def timer():
+    global isChasingMode
+    for i in range(SECONDS):
+        time.sleep(1)
+    isChasingMode = False
 
 def drawCentreText(msg):
     screen.draw.text(msg, center=(300, 300), owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
@@ -107,8 +120,10 @@ def update():
 
     ghost_move += 1
     if ghost_move == ITER:
-        if player.gameStatus != 1:
+        if player.gameStatus != 1 and isChasingMode == False:
             moveGhosts()
+        else:
+            moveRunningGhosts()
         ghost_move = 0
 
 
@@ -193,41 +208,60 @@ def initGhosts():
             # depending on which algorithm user selected ghosts algorithm is being initialised
             if algorithm == 'A*':
                 ghost.algorithm = ghost_interface.AStar(ghost)
+            elif algorithm == 'gen':
+                ghost.algorithm = ghost_interface.GeneticAlgorithm(ghost)
             else:
                 print("Bad algorithm chosen, try again :(")
                 sys.exit(1)
 
 
+def initRunningGhosts():
+    for i in range(4):
+        ghost = Actor("ghost5", (ghosts[i].x, ghosts[i].y))
+        ghost.path = []
+        ghost.index = i + 1
+        ghost.path.append("n1_1")
+        ghost.algorithm = ghost_interface.AStar(ghost)
+        runGhosts.append(ghost)
+
+
 def moveGhosts():
-    global isChasingMode
-    if not isChasingMode:
-        for g in ghosts:
-            # because all algorithms implement the same interface we can call getNextStep
-            node = g.algorithm.getNextStep()
-            if node is None:
-                return
+    for g in ghosts:
+        # because all algorithms implement the same interface we can call getNextStep
+        node = g.algorithm.getNextStep()
+        if node is None:
+            return
 
-            index = node.find('_')
-            g.x = int(node[index + 1:]) * 20 + 10
-            g.y = int(node[1:index]) * 20 + 10
+        index = node.find('_')
+        g.x = int(node[index + 1:]) * 20 + 10
+        g.y = int(node[1:index]) * 20 + 10
 
-            g.draw()
+        for ghost in runGhosts:
+            ghost.x = g.x
+            ghost.y = g.y
+        g.draw()
 
-    else:
-        for i in range(4):
-            ghost = Actor("ghost5", (ghosts[i].x, ghosts[i].y))
-            ghost.path = []
-            runGhosts.append(ghost)
+        # TODO find out why pink ghost dosn't show over dark blue and fix path
 
-        for g in runGhosts:
-            for ghost in ghosts:
-                ghost.x = g.x
-                ghost.y = g.y
-                # TODO (debug) pink ghost doesn't change position!
-            g.draw()
+def moveRunningGhosts():
+    for g in runGhosts:
+        node = g.algorithm.getNextStep()
+        if node is None:
+            return
+        index = node.find('_')
+        g.x = int(node[index + 1:]) * 20 + 10
+        g.y = int(node[1:index]) * 20 + 10
+
+        for ghost in ghosts:
+            ghost.x = g.x
+            ghost.y = g.y
+        g.draw()
+
+
 
 # TODO da ne smara svaki put, za sad imamo samo A* pa ne mora da se unosi :D
 algorithm = 'A*'
+#algorithm = 'gen'
 # algorithm = input("Enter which algorithm to use for ghosts: ")
 init()
 pgzrun.go()

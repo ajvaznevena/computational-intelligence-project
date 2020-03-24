@@ -19,3 +19,4 @@ ITER = 25
 isChasingMode = False   # when power dot is eaten
 runGhosts = []  # list of all ghosts when players is chasing them
 SECONDS = 5
+isInitialized = False
