@@ -8,7 +8,9 @@ from pgzero.animation import animate
 
 import key_input
 import maps
-import ghost_interface
+
+from algorithms.a_star import AStar
+from algorithms.genetic_algorithm import GeneticAlgorithm
 from game_config import *
 
 
@@ -56,6 +58,7 @@ def draw():
     # drawing running ghosts
     for g in runGhosts:
         if player.collidepoint((g.x, g.y)):
+            sounds.pacman_eat_ghost.play()
             g.x = 290
             g.y = 290
         g.draw()
@@ -207,9 +210,9 @@ def initGhosts():
 
             # depending on which algorithm user selected ghosts algorithm is being initialised
             if algorithm == 'A*':
-                ghost.algorithm = ghost_interface.AStar(ghost)
+                ghost.algorithm = AStar(ghost)
             elif algorithm == 'gen':
-                ghost.algorithm = ghost_interface.GeneticAlgorithm(ghost)
+                ghost.algorithm = GeneticAlgorithm(ghost)
             else:
                 print("Bad algorithm chosen, try again :(")
                 sys.exit(1)
@@ -258,10 +261,9 @@ def moveRunningGhosts():
         g.draw()
 
 
-
 # TODO da ne smara svaki put, za sad imamo samo A* pa ne mora da se unosi :D
 algorithm = 'A*'
-#algorithm = 'gen'
+# algorithm = 'gen'
 # algorithm = input("Enter which algorithm to use for ghosts: ")
 init()
 pgzrun.go()

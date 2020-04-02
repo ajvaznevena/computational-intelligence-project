@@ -4,7 +4,6 @@ from graph import create_graph
 
 import numpy as np
 
-
 WIDTH = 600
 HEIGHT = 580
 SPEED = 3
