@@ -5,6 +5,7 @@ from algorithms.ghost_interface import AlgorithmInterface
 class GeneticAlgorithm(AlgorithmInterface):
 
     def __init__(self, ghost):
+        super().__init__()
         self.ghost = ghost
         self.max_iter = 300
 
