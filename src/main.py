@@ -43,11 +43,12 @@ def draw():
         if player.gameStatus == 0:
             if caught(g):
                 if not isChasingMode:
+                    player.lives -= 1
                     player.gameStatus = 1
 
     # drawing running ghosts
     for g in runGhosts:
-        if player.collidepoint((g.x, g.y)):
+        if caught(g):
             sounds.pacman_eat_ghost.play()
             g.x = 290
             g.y = 290
@@ -84,7 +85,7 @@ def drawCentreText(msg):
 
 
 def update():
-    global ghostMovement    # to change global variable this statement is needed
+    global ghostMovement  # to change global variable this statement is needed
 
     if player.gameStatus == 0:  # player is moving
         if player.inputEnabled:

@@ -1,8 +1,8 @@
-from abc import ABC, abstractmethod
-from game_config import *
-
-import random
 import sys
+from abc import ABC, abstractmethod
+from algorithms.ghost_goals import *
+
+from game_config import *
 
 
 class AlgorithmInterface(ABC):
@@ -40,56 +40,16 @@ class AlgorithmInterface(ABC):
 
         # Lightblue ghost's goal is 4 fields ahead of player's current position (index = 2)
         elif index == 2:
-            return self.lightBlueGoal()
+            return lightBlueGoal(self)
 
         # Orange ghost's goal is random node (index = 3)
         elif index == 3:
-            return self.orangeGoal()
+            return orangeGoal(self)
 
         # Pink ghost's goal is 8 fields behind player's current position (index = 4)
         elif index == 4:
-            return self.pinkGoal()
+            return pinkGoal(self)
 
-    def lightBlueGoal(self):
-        targetX, targetY = 0, 0
-
-        # see where player is moving
-        if (player.angle // 90) % 2 == 0:
-            targetX = -80 if player.movex < 0 else 80  # 4 * 20
-        else:
-            targetY = -80 if player.movey < 0 else 80
-
-        gridX, gridY = self.pixelToGrid((player.x + targetX, player.y + targetY))
-
-        if 0 <= gridX < 29 and 0 <= gridY < 30:
-            if grid[gridX, gridY]:
-                return gridX, gridY
-
-        return self.pixelToGrid((player.x, player.y))
-
-    def orangeGoal(self):
-        nodesNo = len(graph.adjacency_list)
-        r = random.randrange(nodesNo)
-
-        goal = list(graph.adjacency_list.keys())[r]
-        return self.getCoordsFromName(goal)
-
-    def pinkGoal(self):
-        targetX, targetY = 0, 0
-
-        # see where player is moving
-        if (player.angle // 90) % 2 == 0:
-            targetX = 160 if player.movex < 0 else -160  # 8 * 20
-        else:
-            targetY = 160 if player.movey < 0 else -160
-
-        tarX, tarY = self.pixelToGrid((player.x + targetX, player.y + targetY))
-
-        if 0 <= tarX < 29 and 0 <= tarY < 30:
-            if grid[tarX, tarY]:
-                return tarX, tarY
-
-        return self.pixelToGrid((player.x, player.y))
 
     @staticmethod
     def pixelToGrid(node):

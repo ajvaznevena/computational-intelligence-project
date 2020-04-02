@@ -35,9 +35,4 @@ def getPlayerImage():
 
 
 def caught(ghost):
-    if player.collidepoint((ghost.x, ghost.y)):
-        if not isChasingMode:
-            player.lives -= 1
-        return True
-    else:
-        return False
+    return player.collidepoint((ghost.x, ghost.y))
