@@ -26,9 +26,6 @@ def draw():
                 player.score += 20
                 dots.remove(d)
                 isChasingMode = True
-                if not isInitialized:
-                    initRunningGhosts()
-                isInitialized = True
                 measureTime()
 
     for d in dots:
@@ -38,21 +35,27 @@ def draw():
         player.gameStatus = 3
 
     # drawing ghosts
-    for g in ghosts:
-        g.draw()
-        if player.gameStatus == 0:
-            if caught(g):
-                if not isChasingMode:
+    if not isChasingMode:
+        for g in ghosts:
+            g.draw()
+            if player.gameStatus == 0:
+                if caught(g):
                     player.lives -= 1
                     player.gameStatus = 1
 
     # drawing running ghosts
-    for g in runGhosts:
-        if caught(g):
-            sounds.pacman_eat_ghost.play()
-            g.x = 290
-            g.y = 290
-        g.draw()
+    else:
+        for g in runGhosts:
+            if caught(g):
+                sounds.pacman_eat_ghost.play()
+                for ghost in ghosts:
+                    if g.index == ghost.index:
+                        ghost.x = 290
+                        ghost.y = 290
+                        ghost.path = []
+                        g.x = ghost.x
+                        g.y = ghost.y
+            g.draw()
 
     if player.lives == 0:
         player.gameStatus = 2
@@ -99,7 +102,6 @@ def update():
 
     elif player.gameStatus == 1:  # player caught
         i = key_input.checkInput(player)
-
         if i == 1:
             player.gameStatus = 0
             player.x = 290
@@ -110,16 +112,14 @@ def update():
 
     elif player.gameStatus == 2:
         i = key_input.checkInput(player)
-
         if i == 1:
             print("GAME OVER")
             sys.exit(0)
 
     ghostMovement += 1
     if ghostMovement == ITER:
-        if player.gameStatus != 1 and isChasingMode == False:
+        if player.gameStatus != 1:
             moveGhosts()
-        else:
             moveRunningGhosts()
         ghostMovement = 0
 
@@ -131,6 +131,7 @@ def init(alg):
     initPlayer()
     initDots()
     initGhosts(alg)
+    initRunningGhosts()
 
 
 # TODO da ne smara svaki put, za sad imamo samo A* pa ne mora da se unosi :D
