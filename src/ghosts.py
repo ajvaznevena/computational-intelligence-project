@@ -40,10 +40,7 @@ def moveGhosts():
         index = node.find('_')
         g.x = int(node[index + 1:]) * 20 + 10
         g.y = int(node[1:index]) * 20 + 10
-
-
         g.draw()
-
 
 def moveRunningGhosts():
     for g in runGhosts:
