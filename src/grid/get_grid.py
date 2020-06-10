@@ -51,6 +51,7 @@ def run():
 
     pixels_mapped = np.array(pixels_mapped).T
 
+    # because cells are 20x20, this is image (width / 20) * (height / 20) = 870
     grid = np.zeros(870)
     br = 0
     for ntuple in convolved_2d(pixels_mapped, kernel_size=20, stride=20):

@@ -1,6 +1,7 @@
 import random
 from game_config import *
 
+
 def lightBlueGoal(self):
     targetX, targetY = 0, 0
 

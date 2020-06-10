@@ -2,6 +2,17 @@ from grid.get_grid import get_grid
 import numpy as np
 
 
+class Graph:
+    def __init__(self, adjacency_list):
+        self.adjacency_list = adjacency_list
+
+    def __str__(self):
+        return str(self.adjacency_list)
+
+    def get_neighbors(self, v):
+        return self.adjacency_list[v]
+
+
 def create_graph():
     adjacency_list = get_adjacency_list()
     return Graph(adjacency_list)
@@ -41,14 +52,3 @@ def get_adjacency_list():
 
 def get_node_name(i, j):
     return 'n' + str(i) + '_' + str(j)
-
-
-class Graph:
-    def __init__(self, adjacency_list):
-        self.adjacency_list = adjacency_list
-
-    def __str__(self):
-        return str(self.adjacency_list)
-
-    def get_neighbors(self, v):
-        return self.adjacency_list[v]

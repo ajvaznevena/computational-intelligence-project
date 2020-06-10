@@ -20,14 +20,14 @@ def checkMovePoint(player):
 
 
 # get which dot to draw
-def checkDotPoint(x, y):
-    global dotImage
+def checkDotPoint(pos):
+
     # small dot
-    if dotImage.get_at((int(x), int(y))) == Color('black'):
+    if dotImage.get_at((int(pos[0]), int(pos[1]))) == Color('black'):
         return 1
 
     # power dot
-    elif dotImage.get_at((int(x), int(y))) == Color('red'):
+    elif dotImage.get_at((int(pos[0]), int(pos[1]))) == Color('red'):
         return 2
 
     else:
