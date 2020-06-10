@@ -10,14 +10,20 @@ black and 0 in any other case.
 Player can move only on fields with value 1.
 '''
 
+grid = []
+
 
 def get_grid():
-    grid = []
+    global grid
+
+    if grid != []:
+        return grid
 
     while not grid:
         try:
             grid = np.load('grid/grid' + '.npy')
             return grid
+
         except IOError:
             print("For some reason file with grid does not exist, so let's create one :)")
             run()

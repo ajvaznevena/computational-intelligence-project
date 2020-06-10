@@ -50,20 +50,19 @@ class AlgorithmInterface(ABC):
         elif index == 4:
             return pinkGoal(self)
 
-
     @staticmethod
     def pixelToGrid(node):
         # this is safe because player and ghosts only move on value 1 in grid
-        return round(node[1] // 20), round(node[0] // 20)
+        return int(node[1] // 20), int(node[0] // 20)
 
     @staticmethod
     def getNodeName(node):
         return "n" + str(node[0]) + "_" + str(node[1])
 
     @staticmethod
-    def getCoordsFromName(str):
-        index = str.find('_')
-        coordX = int(str[1:index])
-        coordY = int(str[index + 1:])
+    def getCoordsFromName(name):
+        index = name.find('_')
+        coordX = int(name[1:index])
+        coordY = int(name[index + 1:])
 
         return coordX, coordY

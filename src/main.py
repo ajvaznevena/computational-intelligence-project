@@ -63,7 +63,7 @@ def update():
     # calculating dots
     for d in dots:
         if d.collidepoint((player.x, player.y)):
-            sounds.pacman_eat.play()
+            # sounds.pacman_eat.play()
             if d.dotType == 1:
                 player.score += 10
                 dots.remove(d)
@@ -89,14 +89,14 @@ def update():
             ghost.setImage("ghost5")
 
             if player.caught(ghost, isChasingMode):
-                sounds.pacman_eat_ghost.play()
+                # sounds.pacman_eat_ghost.play()
                 ghost.x = 290
                 ghost.y = 290
                 ghost.path = []
 
     if player.lives == 0:
         player.gameStatus = 2
-        sounds.pacman_death.play()
+        # sounds.pacman_death.play()
 
     ghostMovement += 1
     if ghostMovement == ITER:
@@ -106,8 +106,8 @@ def update():
 
 
 def init():
-    music.play('background_music')
-    music.set_volume(0.2)
+    # music.play('background_music')
+    # music.set_volume(0.2)
 
     # depending on which algorithm user selected ghosts algorithm is being initialised
     for g in ghosts:
