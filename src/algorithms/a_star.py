@@ -69,3 +69,22 @@ class AStar(AlgorithmInterface):
         finishX, finishY = AlgorithmInterface.getCoordsFromName(goal)
 
         return abs(vX - finishX) + abs(vY - finishY)
+
+    def getNextStep(self):
+        if self.ghost.path == [] or self.ghost.path[-1] != self.goalNameKey:
+            path = self.run()
+
+            if path is None:
+                print("Error :(")
+                sys.exit(1)
+
+            self.ghost.path = path
+            self.goalNameKey = self.ghost.path[-1] if self.ghost.path != [] else ''
+        else:
+            # if goal did not change, we dont'h have to recalculate path again
+            self.ghost.path.pop(0)
+
+        if len(self.ghost.path) == 0:
+            return None
+        else:
+            return self.ghost.path[0]

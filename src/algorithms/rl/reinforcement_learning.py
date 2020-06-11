@@ -2,6 +2,7 @@ from grid.get_grid import get_grid
 from algorithms.rl.ghost import *
 from algorithms.rl.dots import *
 from algorithms.rl.player import Player
+from algorithms.run_away import Frightened
 
 import numpy as np
 import random
@@ -16,8 +17,9 @@ class Environment:
         self.player = Player()
         self.dots = []
         self.ghosts = []
-        self.chasingLast = 0
         self.actions = {}
+        self.chasing = False
+        self.chasingLast = 0
 
     def reset(self):
         grid = np.array(get_grid(), copy=True)
@@ -46,12 +48,12 @@ class Environment:
     def mapPlayerOnGrid(self, grid):
         grid[int(self.player.y // CELL_SIZE)][int(self.player.x // CELL_SIZE)] = PLAYER_CODE
 
-    def mapGhostsOnGrid(self,  grid, chasing=False):
+    def mapGhostsOnGrid(self,  grid):
         for ghost in self.ghosts:
             i = int(ghost.y // CELL_SIZE)
             j = int(ghost.x // CELL_SIZE)
             grid[i][j] = ghost.index + GHOST_ADD
-            grid[i][j] += GHOST_CODE_CHASE if chasing else 0
+            grid[i][j] += GHOST_CODE_CHASE if self.chasing else 0
 
     @staticmethod
     def sample():
@@ -60,16 +62,31 @@ class Environment:
         return actions[random.randrange(0, 5)]
 
     def step(self, action):
+        self.chasingLast += 1 if self.chasing else 0
+
+        if self.chasingLast == FIVE_SECS:
+            self.chasingLast = 0
+            self.chasing = False
+            for ghost in self.ghosts:
+                ghost.path = []
+                ghost.algorithm = AStar(ghost, self.player)
+
         grid = np.array(get_grid(), copy=True)
 
         self.actions.get(action)()
         self.mapPlayerOnGrid(grid)
 
-        self.player.eatPill(self.dots)
+        if self.player.eatPill(self.dots):
+            self.chasing = True
         self.mapDotsOnGrid(grid)
 
+        if self.chasing and self.chasingLast == 0:
+            for ghost in self.ghosts:
+                ghost.path = []
+                ghost.algorithm = Frightened(ghost)
+
         moveGhosts(self.ghosts)
-        self.mapGhostsOnGrid(grid, self.player.getChasing())
+        self.mapGhostsOnGrid(grid)
 
         r = self.reward()
 

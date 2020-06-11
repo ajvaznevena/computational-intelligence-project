@@ -5,18 +5,13 @@ from maps import checkMovePoint
 class Player:
 
     def __init__(self):
-        self.x, self.y = (30, 470)
+        self.x, self.y = (WIDTH / 2 - CELL_SIZE / 2, 490)
         self.movex, self.movey = (0, 0)
         self.angle = 0
         self.score = 0
-        self.chasing = False
-        self.chasingLast = 0
 
     def getScore(self):
         return self.score
-
-    def getChasing(self):
-        return self.chasing
 
     def moveLeft(self):
         self.angle = 180
@@ -46,12 +41,6 @@ class Player:
         self.movey = 0
         self.angle = 0
 
-        self.chasingLast += 1 if self.chasing else 0
-
-        if self.chasingLast == FIVE_SECS:
-            self.chasingLast = 0
-            self.chasing = False
-
     def caught(self, ghost):
         return int(self.y // CELL_SIZE) == int(ghost.y // CELL_SIZE) \
                and int(self.x // CELL_SIZE) == int(ghost.x // CELL_SIZE)
@@ -65,5 +54,7 @@ class Player:
 
                 elif dot.dotType == 2:
                     self.score += BIG_PILL_CODE
-                    self.chasing = True
                     dot.eaten = True
+                    return True
+
+        return False

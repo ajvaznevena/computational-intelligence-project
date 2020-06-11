@@ -1,6 +1,7 @@
 from game_config import *
 from algorithms.a_star import AStar
 from algorithms.genetic_algorithm import GeneticAlgorithm
+from algorithms.run_away import Frightened
 import key_input
 
 
@@ -39,6 +40,8 @@ def startTimer():
 
     for ghost in ghosts:
         ghost.setImage("ghost5")
+        ghost.path = []
+        ghost.setAlgorithm(Frightened(ghost))
 
     clock.schedule_unique(returnGhostsToNormal, 5.0)
 
@@ -49,6 +52,8 @@ def returnGhostsToNormal():
     isChasingMode = False
     for ghost in ghosts:
         ghost.setImage("ghost" + str(ghost.index))
+        ghost.path = []
+        ghost.setAlgorithm(AStar(ghost, player))
 
 
 def drawCentreText(msg):
