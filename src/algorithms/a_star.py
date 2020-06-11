@@ -1,5 +1,4 @@
-from algorithms.ghost_interface import AlgorithmInterface
-from game_config import graph
+from algorithms.ghost_interface import AlgorithmInterface, graph
 
 
 class AStar(AlgorithmInterface):

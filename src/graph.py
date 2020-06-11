@@ -21,7 +21,7 @@ def create_graph():
 # list of node neighbours
 def get_adjacency_list():
     adjacency_list = {}
-    grid = np.array(get_grid())
+    grid = np.array(get_grid(), copy=True)
     rows, columns = grid.shape
 
     for i in range(rows):

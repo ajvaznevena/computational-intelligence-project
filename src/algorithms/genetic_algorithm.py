@@ -1,8 +1,6 @@
 import random
-from algorithms.ghost_interface import AlgorithmInterface
+from algorithms.ghost_interface import AlgorithmInterface, graph
 from algorithms.a_star import AStar
-from game_config import graph
-from grid.get_grid import get_grid
 
 
 class GeneticAlgorithm(AlgorithmInterface):

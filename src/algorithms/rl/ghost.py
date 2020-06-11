@@ -1,25 +1,24 @@
+from algorithms.rl.grid_config import *
 from algorithms.a_star import AStar
-
-import time
 
 
 class Ghost:
 
-    def __init__(self, x, y, i, seconds, player):
+    def __init__(self, x, y, i, frames, player):
         self.x = x
         self.y = y
         self.index = i
         self.path = []
         self.algorithm = AStar(self, player)
-        self.time = time.time()
-        self.seconds = seconds
+        self.time = 0
+        self.frames = frames
 
 
-def initGhosts():
+def initGhosts(player):
     ghosts = []
 
     for i in range(1, 5, 1):
-        ghost = Ghost(270 + (i-1) * 20, 290, i, (i-1) * 3)
+        ghost = Ghost(270 + (i-1) * CELL_SIZE, HEIGHT / 2, i, (i-1) * THREE_SECS, player)
 
         if i == 3:
             ghost.path.append("n1_1")
@@ -30,11 +29,14 @@ def initGhosts():
 
 def moveGhosts(ghosts):
     for ghost in ghosts:
-        if time.time() - ghost.time >= ghost.seconds:
+        if ghost.time >= ghost.frames:
             node = ghost.algorithm.getNextStep()
             if node is None:
                 return
 
             index = node.find('_')
-            ghost.x = int(node[index + 1:]) * 20 + 10
-            ghost.y = int(node[1:index]) * 20 + 10
+            ghost.x = int(node[index + 1:]) * CELL_SIZE + CELL_SIZE / 2
+            ghost.y = int(node[1:index]) * CELL_SIZE + CELL_SIZE / 2
+
+        else:
+            ghost.time += 1

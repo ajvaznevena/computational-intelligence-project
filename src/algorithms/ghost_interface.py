@@ -1,8 +1,14 @@
 import sys
 import random
+import numpy as np
 
 from abc import ABC, abstractmethod
-from game_config import graph, grid
+
+from grid.get_grid import get_grid
+from graph import create_graph
+
+grid = np.array(get_grid(), copy=True)   # movement grid
+graph = create_graph()  # movement graph
 
 
 class AlgorithmInterface(ABC):
@@ -23,7 +29,7 @@ class AlgorithmInterface(ABC):
                 sys.exit(1)
 
             self.ghost.path = path
-            self.goalNameKey = self.ghost.path[-1]
+            self.goalNameKey = self.ghost.path[-1] if self.ghost.path != [] else ''
         else:
             # if goal did not change, we dont'h have to recalculate path again
             self.ghost.path.pop(0)
