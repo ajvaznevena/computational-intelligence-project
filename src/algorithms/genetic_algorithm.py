@@ -2,14 +2,15 @@ import random
 from algorithms.ghost_interface import AlgorithmInterface
 from algorithms.a_star import AStar
 from game_config import graph
-from grid.get_grid import *
+from grid.get_grid import get_grid
 
 
 class GeneticAlgorithm(AlgorithmInterface):
 
-    def __init__(self, ghost):
+    def __init__(self, ghost, player):
         super().__init__()
         self.ghost = ghost
+        self.player = player
         self.max_iter = 300
         self.populationSize = 50
         self.eliteSize = 16    # ~33% of population size
@@ -18,8 +19,8 @@ class GeneticAlgorithm(AlgorithmInterface):
         population = []
         newPopulation = []
         for i in range(self.populationSize):
-            population.append(Individual(self.ghost))
-            newPopulation.append(Individual(self.ghost))
+            population.append(Individual(self.ghost, self.player))
+            newPopulation.append(Individual(self.ghost, self.player))
 
         for iteration in range(self.max_iter):
             # print(self.ghost.index, iteration)
@@ -68,9 +69,10 @@ class GeneticAlgorithm(AlgorithmInterface):
 
 
 class Individual(AlgorithmInterface):
-    def __init__(self, ghost):
+    def __init__(self, ghost, player):
         super().__init__()
         self.ghost = ghost
+        self.player = player
         self.code = self.getCode()        # hromozom je trenutna pozicija
         self.correctNonFeasible()
         self.fitness = 600         # TODO odrediti najveci broj

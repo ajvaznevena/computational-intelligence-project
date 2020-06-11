@@ -1,3 +1,5 @@
+import pgzrun
+
 from grid.get_grid import get_grid
 from graph import create_graph
 
@@ -25,5 +27,3 @@ ghostMovement = 0
 ITER = 25
 
 isChasingMode = False   # when power dot is eaten
-SECONDS = 5
-timer = 0

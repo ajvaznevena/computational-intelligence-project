@@ -1,6 +1,7 @@
 from game_config import *
 from algorithms.a_star import AStar
 from algorithms.genetic_algorithm import GeneticAlgorithm
+import key_input
 
 
 def draw():
@@ -11,6 +12,7 @@ def draw():
     # draw player
     player.getImageAndDraw()
     drawScore()
+    drawLives()
 
     # draw dots
     for d in dots:
@@ -21,19 +23,32 @@ def draw():
         g.draw()
 
     if player.gameStatus == 2:
-        drawCentreText("GAME OVER")
+        drawCentreText("GAME OVER\nPress SPACE\nto try again")
 
     if player.gameStatus == 3:
-        drawCentreText("YOU WON!")
+        drawCentreText("YOU WON!\nPress SPACE\nto try again")
 
     if player.gameStatus == 1:
         drawCentreText("CAUGHT!\nPress SPACE\nto Continue")
 
 
 def startTimer():
-    global timer
+    global isChasingMode
 
-    timer = time.time()
+    isChasingMode = True
+
+    for ghost in ghosts:
+        ghost.setImage("ghost5")
+
+    clock.schedule_unique(returnGhostsToNormal, 5.0)
+
+
+def returnGhostsToNormal():
+    global isChasingMode
+
+    isChasingMode = False
+    for ghost in ghosts:
+        ghost.setImage("ghost" + str(ghost.index))
 
 
 def drawCentreText(msg):
@@ -43,22 +58,29 @@ def drawCentreText(msg):
 
 def drawScore():
     screen.draw.text('Score: ' + str(player.score), center=(55, 340), owidth=0.5,
-                     ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=30)
+                     ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=20)
+
+
+def drawLives():
+    screen.draw.text('Lives left: ' + str(player.lives), center=(545, 340), owidth=0.5,
+                     ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=20)
 
 
 def update():
     global ghostMovement  # to change global variable this statement is needed
-    global isChasingMode
-    global timer
+    global isChasingMode, ghosts
+
+    # when player dies, reinitialize ghosts
+    if player.gameStatus == 1:
+        ghosts = initGhosts()
+        initAlgorithm()
+
+    if player.gameStatus == 2:
+        i = key_input.checkInput(player)
+        if i == 1:
+            restartGame()
 
     player.update()
-
-    # calculating passed time if in chasing mode
-    if isChasingMode and time.time() - timer > SECONDS:
-        timer = 0
-        isChasingMode = False
-        for ghost in ghosts:
-            ghost.setImage("ghost" + str(ghost.index))
 
     # calculating dots
     for d in dots:
@@ -71,11 +93,13 @@ def update():
             else:
                 player.score += 20
                 dots.remove(d)
-                isChasingMode = True
                 startTimer()
 
     if len(dots) == 0:
         player.gameStatus = 3
+        i = key_input.checkInput(player)
+        if i == 1:
+            restartGame()
 
     if not isChasingMode:
         for ghost in ghosts:
@@ -86,10 +110,10 @@ def update():
 
     else:
         for ghost in ghosts:
-            ghost.setImage("ghost5")
 
             if player.caught(ghost, isChasingMode):
                 # sounds.pacman_eat_ghost.play()
+                player.score += 200
                 ghost.x = 290
                 ghost.y = 290
                 ghost.path = []
@@ -97,12 +121,22 @@ def update():
     if player.lives == 0:
         player.gameStatus = 2
         # sounds.pacman_death.play()
+    else:
+        ghostMovement += 1
+        if ghostMovement == ITER:
+            if player.gameStatus != 1:
+                moveGhosts(ghosts)
+            ghostMovement = 0
 
-    ghostMovement += 1
-    if ghostMovement == ITER:
-        if player.gameStatus != 1:
-            moveGhosts(ghosts)
-        ghostMovement = 0
+
+def restartGame():
+    global dots, ghosts, ghostMovement
+
+    player.onGameRestart()
+    dots = initDots()
+    ghosts = initGhosts()
+    ghostMovement = 0
+    initAlgorithm()
 
 
 def init():
@@ -110,13 +144,17 @@ def init():
     # music.set_volume(0.2)
 
     # depending on which algorithm user selected ghosts algorithm is being initialised
+    initAlgorithm()
+
+
+def initAlgorithm():
     for g in ghosts:
 
         if algorithm == 'A*':
-            g.setAlgorithm(AStar(g))
+            g.setAlgorithm(AStar(g, player))
 
         elif algorithm == 'gen':
-            g.setAlgorithm(GeneticAlgorithm(g))
+            g.setAlgorithm(GeneticAlgorithm(g, player))
 
 
 # TODO da ne smara svaki put, za sad imamo samo A* pa ne mora da se unosi :D

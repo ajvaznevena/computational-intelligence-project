@@ -3,8 +3,6 @@ from pgzero.animation import animate
 import key_input
 from maps import checkMovePoint
 
-import sys
-
 
 class Player(Actor):
 
@@ -27,6 +25,9 @@ class Player(Actor):
         self.inputEnabled = True
 
     def getImageAndDraw(self):
+        if self.gameStatus != 0:
+            return
+
         angle = self.angle
 
         self.eatAnimation = (self.eatAnimation + 1) % 10
@@ -51,17 +52,26 @@ class Player(Actor):
         self.draw()
 
     def caught(self, ghost, chasing):
-        if self.colliderect(ghost) and not chasing:
+        if self.collidepoint(ghost.pos) and not chasing:
             self.died = True
 
-        return self.colliderect(ghost)
+        return self.collidepoint(ghost.pos)
 
     def restart(self):
-        self.gameStatus = 0
         self.x = 290
         self.y = 490
+        self.gameStatus = 0
         self.angle = 0
+        self.movex = 0
+        self.movey = 0
+        self.eatAnimation = 0
         self.died = False
+
+    def onGameRestart(self):
+        self.restart()
+        self.lives = 3
+        self.score = 0
+        self.inputEnabled = True
 
     def update(self):
         if self.gameStatus == 0:  # player is moving
@@ -78,16 +88,3 @@ class Player(Actor):
             i = key_input.checkInput(self)
             if i == 1:
                 self.restart()
-
-            return
-
-        elif self.gameStatus == 2:
-            i = key_input.checkInput(self)
-            if i == 1:
-                print("GAME OVER")
-                sys.exit(0)
-
-        else:
-            i = key_input.checkInput(self)
-            if i == 1:
-                sys.exit(0)

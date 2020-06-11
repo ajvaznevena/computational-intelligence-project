@@ -1,12 +1,13 @@
 from algorithms.ghost_interface import AlgorithmInterface
-from game_config import *
+from game_config import graph
 
 
 class AStar(AlgorithmInterface):
 
-    def __init__(self, ghost):
+    def __init__(self, ghost, player):
         super().__init__()
         self.ghost = ghost
+        self.player = player
 
     def run(self):
         start = self.pixelToGrid((self.ghost.x, self.ghost.y))
