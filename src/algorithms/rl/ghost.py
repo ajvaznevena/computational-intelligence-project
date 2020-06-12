@@ -13,6 +13,11 @@ class Ghost:
         self.time = 0
         self.frames = frames
 
+    def restart(self):
+        self.x = 290
+        self.y = 290
+        self.path = []
+
 
 def initGhosts(player):
     ghosts = []

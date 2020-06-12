@@ -1,12 +1,17 @@
+from key_input import checkInput, playerMove
+from maps import checkMovePoint
+from algorithms.rl.dqn import Agent
+from game_state import stateTransformer
+from grid.get_grid import get_grid
+
 from pgzero.builtins import Actor
 from pgzero.animation import animate
-import key_input
-from maps import checkMovePoint
+import numpy as np
 
 
 class Player(Actor):
 
-    def __init__(self, img):
+    def __init__(self, img, type):
         super().__init__(img)
 
         self.pos = 290, 490
@@ -17,8 +22,15 @@ class Player(Actor):
         self.movex = 0
         self.movey = 0
         self.inputEnabled = True
+
         self.eatAnimation = 0
         self.died = False
+
+        self.type = type
+        self.agent = Agent(np.array(get_grid()).shape, 4) if type == 'rl' else None
+
+    def getPlayerType(self):
+        return self.type
 
     def inputEnable(self):
         self.movex = self.movey = 0
@@ -58,8 +70,7 @@ class Player(Actor):
         return self.collidepoint(ghost.pos)
 
     def restart(self):
-        self.x = 290
-        self.y = 490
+        self.pos = 290, 490
         self.gameStatus = 0
         self.angle = 0
         self.movex = 0
@@ -73,18 +84,29 @@ class Player(Actor):
         self.score = 0
         self.inputEnabled = True
 
-    def update(self):
+    @staticmethod
+    def mapActionIndexToString(action):
+        if action == 0: return 'UP'
+        elif action == 1: return 'DOWN'
+        elif action == 2: return 'LEFT'
+        elif action == 3: return 'RIGHT'
+        elif action == 4: return 'STAY'
+
+    def update(self, dots, ghosts, isChasingMode):
         if self.gameStatus == 0:  # player is moving
             if self.inputEnabled:
-                key_input.checkInput(self)
+                if self.type == 'human':
+                    checkInput(self)
+
+                elif self.type == 'rl':
+                    state = stateTransformer(self, dots, ghosts, isChasingMode)
+                    predicted_action = self.agent.act_best_action(state)
+                    print(f'Action: {Player.mapActionIndexToString(predicted_action)}')
+                    playerMove(self, predicted_action)
+
                 checkMovePoint(self)
 
                 if self.movex or self.movey:
                     self.inputEnabled = False
                     animate(self, pos=(self.x + self.movex, self.y + self.movey),
                             duration=1 / 3, tween='linear', on_finished=self.inputEnable)
-
-        elif self.gameStatus == 1:  # player caught
-            i = key_input.checkInput(self)
-            if i == 1:
-                self.restart()

@@ -11,6 +11,8 @@ pgzero = "^1.2"
 conv = "^0.2"
 matplotlib = "^3.2.0"
 pillow = "^7.0.0"
+keras = "^2.3.1"
+tensorflow-gpu = "1.14.0"
 
 [tool.poetry.dev-dependencies]
 

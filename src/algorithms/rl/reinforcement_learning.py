@@ -14,52 +14,59 @@ br = 0
 class Environment:
 
     def __init__(self):
-        self.player = Player()
+        self.grid = None
+        self.player = None
         self.dots = []
         self.ghosts = []
         self.actions = {}
         self.chasing = False
         self.chasingLast = 0
+        self.reset()
+
+    def getStateShape(self):
+        return self.grid.shape
+
+    def getActionSize(self):
+        return len(self.actions)
 
     def reset(self):
-        grid = np.array(get_grid(), copy=True)
+        self.grid = np.array(get_grid(), copy=True)
         self.dots = initDots()
-        self.mapDotsOnGrid(grid)
+        self.mapDotsOnGrid(self.dots, self.grid)
         self.player = Player()
-        self.mapPlayerOnGrid(grid)
+        self.mapPlayerOnGrid(self.player, self.grid)
         self.ghosts = initGhosts(self.player)
-        self.mapGhostsOnGrid(grid)
+        self.mapGhostsOnGrid(self.ghosts, self.grid, self.chasing)
 
         self.actions = {
-            'UP': self.player.moveUp,
-            'DOWN': self.player.moveDown,
-            'LEFT': self.player.moveLeft,
-            'RIGHT': self.player.moveRight,
-            'STAY': self.player.move
+            0: self.player.moveUp,
+            1: self.player.moveDown,
+            2: self.player.moveLeft,
+            3: self.player.moveRight,
+            # 4: self.player.move
         }
 
-        return grid
+        return self.grid
 
-    def mapDotsOnGrid(self, grid):
-        for dot in self.dots:
-            if not dot.eaten:
-                grid[dot.i][dot.j] = REGULAR_PILL_CODE if dot.dotType == 1 else BIG_PILL_CODE
+    @staticmethod
+    def mapDotsOnGrid(dots, grid):
+        for dot in dots:
+            grid[dot.i][dot.j] = REGULAR_PILL_CODE if dot.dotType == 1 else BIG_PILL_CODE
 
-    def mapPlayerOnGrid(self, grid):
-        grid[int(self.player.y // CELL_SIZE)][int(self.player.x // CELL_SIZE)] = PLAYER_CODE
+    @staticmethod
+    def mapPlayerOnGrid(player, grid):
+        grid[int(player.y // CELL_SIZE)][int(player.x // CELL_SIZE)] = PLAYER_CODE
 
-    def mapGhostsOnGrid(self,  grid):
-        for ghost in self.ghosts:
+    @staticmethod
+    def mapGhostsOnGrid(ghosts, grid, chasing):
+        for ghost in ghosts:
             i = int(ghost.y // CELL_SIZE)
             j = int(ghost.x // CELL_SIZE)
             grid[i][j] = ghost.index + GHOST_ADD
-            grid[i][j] += GHOST_CODE_CHASE if self.chasing else 0
+            grid[i][j] += GHOST_CODE_CHASE if chasing else 0
 
-    @staticmethod
-    def sample():
-        actions = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'STAY']
-
-        return actions[random.randrange(0, 5)]
+    def sample(self):
+        return random.randrange(0, len(self.actions))
 
     def step(self, action):
         self.chasingLast += 1 if self.chasing else 0
@@ -71,35 +78,50 @@ class Environment:
                 ghost.path = []
                 ghost.algorithm = AStar(ghost, self.player)
 
-        grid = np.array(get_grid(), copy=True)
+        self.grid = np.array(get_grid(), copy=True)
+
+        reward = 0
 
         self.actions.get(action)()
-        self.mapPlayerOnGrid(grid)
+        if self.player.notValid:
+            reward += NOT_VALID_MOVE_REWARD
+            self.player.notValid = False
 
-        if self.player.eatPill(self.dots):
+        self.mapPlayerOnGrid(self.player, self.grid)
+
+        eatPillReward = self.player.eatPill(self.dots)
+        if eatPillReward:
             self.chasing = True
-        self.mapDotsOnGrid(grid)
+        else:
+            reward += REGULAR_PILL_REWARD
+        # if eatPillReward == BIG_PILL_REWARD:
+        #     self.chasing = True
+
+        # reward += eatPillReward
+
+        done = False
+        if len(self.dots) == 0:
+            done = True
+
+        self.mapDotsOnGrid(self.dots, self.grid)
 
         if self.chasing and self.chasingLast == 0:
             for ghost in self.ghosts:
                 ghost.path = []
                 ghost.algorithm = Frightened(ghost)
 
+        # reward += self.player.eatGhost(self.ghosts, self.chasing)
+
         moveGhosts(self.ghosts)
-        self.mapGhostsOnGrid(grid)
+        self.mapGhostsOnGrid(self.ghosts, self.grid, self.chasing)
 
-        r = self.reward()
-
-        done = False
         for ghost in self.ghosts:
             if self.player.caught(ghost):
+                # reward += PLAYER_DEATH
                 done = True
                 break
 
-        return grid, r, done
-
-    def reward(self):
-        return self.player.getScore()
+        return self.grid, reward, done
 
     @staticmethod
     def renderState(state):
@@ -112,16 +134,3 @@ class Environment:
         plt.savefig('start' + str(br) + '.png')
         plt.clf()
         br += 1
-
-
-env = Environment()
-g = env.reset()
-Environment.renderState(g)
-while True:
-    act = env.sample()
-
-    n, rew, done1 = env.step(act)
-    Environment.renderState(n)
-
-    if done1:
-        break

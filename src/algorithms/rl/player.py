@@ -9,6 +9,7 @@ class Player:
         self.movex, self.movey = (0, 0)
         self.angle = 0
         self.score = 0
+        self.notValid = False
 
     def getScore(self):
         return self.score
@@ -34,7 +35,8 @@ class Player:
         self.move()
 
     def move(self):
-        checkMovePoint(self)
+        self.notValid = True if not checkMovePoint(self) else False
+
         self.x += self.movex
         self.y += self.movey
         self.movex = 0
@@ -47,14 +49,30 @@ class Player:
 
     def eatPill(self, dots):
         for dot in dots:
-            if int(self.y // CELL_SIZE) == dot.i and int(self.x // CELL_SIZE) == dot.j and not dot.eaten:
+            if int(self.y // CELL_SIZE) == dot.i and int(self.x // CELL_SIZE) == dot.j:
                 if dot.dotType == 1:
-                    self.score += REGULAR_PILL_CODE
-                    dot.eaten = True
+                    self.score += 10
+                    dots.remove(dot)
+                    return False
+                    # return REGULAR_PILL_REWARD
 
                 elif dot.dotType == 2:
-                    self.score += BIG_PILL_CODE
+                    self.score += 50
                     dot.eaten = True
                     return True
+                    # return BIG_PILL_REWARD
 
+        # return 0
         return False
+
+    def eatGhost(self, ghosts, chasing):
+        if not chasing:
+            return 0
+
+        for ghost in ghosts:
+            if int(self.y // CELL_SIZE) == int(ghost.y // CELL_SIZE) and int(self.x // CELL_SIZE) == int(ghost.x // CELL_SIZE):
+                self.score += 200
+                ghost.restart()
+                return GHOST_EAT_REWARD
+
+        return 0

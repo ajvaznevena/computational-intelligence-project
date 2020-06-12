@@ -7,7 +7,6 @@ class Dot:
 
     def __init__(self, t, i, j):
         self.dotType = t
-        self.eaten = False
         self.i = i
         self.j = j
 

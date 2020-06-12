@@ -1,6 +1,9 @@
+from algorithms.a_star import AStar
+from algorithms.genetic_algorithm import GeneticAlgorithm
+from algorithms.run_away import Frightened
+
 from pgzero.builtins import Actor
 from pgzero.animation import animate
-
 import time
 
 
@@ -27,6 +30,7 @@ def initGhosts():
     for i in range(1, 5, 1):
         ghost = Ghost(i, "ghost" + str(i), (270 + (i-1) * 20, 290), (i-1) * 3)
 
+        # tell random ghost to start search from upper left corner
         if i == 3:
             ghost.path.append("n1_1")
         ghosts.append(ghost)
@@ -36,8 +40,10 @@ def initGhosts():
 
 def moveGhosts(ghosts):
     for ghost in ghosts:
-        # because all algorithms implement the same interface we can call getNextStep
+
+        # ghosts start chasing player each after few seconds
         if time.time() - ghost.time >= ghost.seconds:
+            # because all algorithms implement the same interface getNextStep can be called
             node = ghost.algorithm.getNextStep()
             if node is None:
                 return
@@ -46,3 +52,16 @@ def moveGhosts(ghosts):
 
             animate(ghost, pos=(int(node[index + 1:]) * 20 + 10, int(node[1:index]) * 20 + 10),
                     duration=1 / 3, tween='linear')
+
+
+def initGhostAlgorithm(ghosts, player, algorithm):
+    for g in ghosts:
+
+        if algorithm == 'A*':
+            g.setAlgorithm(AStar(g, player))
+
+        elif algorithm == 'gen':
+            g.setAlgorithm(GeneticAlgorithm(g, player))
+
+        elif algorithm == 'frightened':
+            g.setAlgorithm(Frightened(g))

@@ -19,6 +19,9 @@ def checkMovePoint(player):
 
     if grid[grid_y][grid_x] != 1.0:
         player.movex = player.movey = 0
+        return False
+
+    return True
 
 
 # get which dot to draw

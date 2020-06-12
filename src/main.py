@@ -1,8 +1,5 @@
 from game_config import *
-from algorithms.a_star import AStar
-from algorithms.genetic_algorithm import GeneticAlgorithm
-from algorithms.run_away import Frightened
-import key_input
+from key_input import checkInput
 
 
 def draw():
@@ -33,7 +30,7 @@ def draw():
         drawCentreText("CAUGHT!\nPress SPACE\nto Continue")
 
 
-def startTimer():
+def startFrightenedTimer():
     global isChasingMode
 
     isChasingMode = True
@@ -41,7 +38,8 @@ def startTimer():
     for ghost in ghosts:
         ghost.setImage("ghost5")
         ghost.path = []
-        ghost.setAlgorithm(Frightened(ghost))
+
+    initGhostAlgorithm(ghosts, player, 'frightened')
 
     clock.schedule_unique(returnGhostsToNormal, 5.0)
 
@@ -50,25 +48,28 @@ def returnGhostsToNormal():
     global isChasingMode
 
     isChasingMode = False
+
     for ghost in ghosts:
         ghost.setImage("ghost" + str(ghost.index))
         ghost.path = []
-        ghost.setAlgorithm(AStar(ghost, player))
+
+    initGhostAlgorithm(ghosts, player, algorithm)
 
 
 def drawCentreText(msg):
-    screen.draw.text(msg, center=(300, 300), owidth=0.5,
-                     ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=60)
+    drawText(msg, (300, 300), 60)
 
 
 def drawScore():
-    screen.draw.text('Score: ' + str(player.score), center=(55, 340), owidth=0.5,
-                     ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=20)
+    drawText('Score: ' + str(player.score), (55, 340))
 
 
 def drawLives():
-    screen.draw.text('Lives left: ' + str(player.lives), center=(545, 340), owidth=0.5,
-                     ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=20)
+    drawText('Lives left: ' + str(player.lives), (545, 340))
+
+
+def drawText(msg, pos, fontsize=20):
+    screen.draw.text(msg, center=pos, owidth=0.5, ocolor=(255, 255, 255), color=(255, 64, 0), fontsize=fontsize)
 
 
 def update():
@@ -78,14 +79,18 @@ def update():
     # when player dies, reinitialize ghosts
     if player.gameStatus == 1:
         ghosts = initGhosts()
-        initAlgorithm()
+        initGhostAlgorithm(ghosts, player, algorithm)
+        i = checkInput(player)
+        if i == 1:
+            player.restart()
 
     if player.gameStatus == 2:
-        i = key_input.checkInput(player)
+        i = checkInput(player)
         if i == 1:
             restartGame()
 
-    player.update()
+    if player.getPlayerType() == 'human':
+        player.update(dots, ghosts, isChasingMode)
 
     # calculating dots
     for d in dots:
@@ -94,15 +99,15 @@ def update():
             if d.dotType == 1:
                 player.score += 10
                 dots.remove(d)
-                break
             else:
-                player.score += 20
+                player.score += 50
                 dots.remove(d)
-                startTimer()
+                startFrightenedTimer()
+            break
 
     if len(dots) == 0:
         player.gameStatus = 3
-        i = key_input.checkInput(player)
+        i = checkInput(player)
         if i == 1:
             restartGame()
 
@@ -131,6 +136,8 @@ def update():
         if ghostMovement == ITER:
             if player.gameStatus != 1:
                 moveGhosts(ghosts)
+            if player.getPlayerType() != 'human':
+                player.update(dots, ghosts, isChasingMode)
             ghostMovement = 0
 
 
@@ -141,7 +148,7 @@ def restartGame():
     dots = initDots()
     ghosts = initGhosts()
     ghostMovement = 0
-    initAlgorithm()
+    initGhostAlgorithm(ghosts, player, algorithm)
 
 
 def init():
@@ -149,17 +156,7 @@ def init():
     # music.set_volume(0.2)
 
     # depending on which algorithm user selected ghosts algorithm is being initialised
-    initAlgorithm()
-
-
-def initAlgorithm():
-    for g in ghosts:
-
-        if algorithm == 'A*':
-            g.setAlgorithm(AStar(g, player))
-
-        elif algorithm == 'gen':
-            g.setAlgorithm(GeneticAlgorithm(g, player))
+    initGhostAlgorithm(ghosts, player, algorithm)
 
 
 # TODO da ne smara svaki put, za sad imamo samo A* pa ne mora da se unosi :D
