@@ -7,7 +7,7 @@ from keras.layers import Dense, Conv2D, MaxPool2D, Flatten
 from keras.optimizers import Adam
 import matplotlib.pyplot as plt
 
-from algorithms.rl.reinforcement_learning import Environment
+from algorithms.rl.pacman_environment import Environment
 
 
 class Agent:
@@ -16,12 +16,13 @@ class Agent:
         self.weight_backup = "dqn_weight.h5"
         self.state_size = state_size
         self.action_size = action_size
-        self.memory = deque(maxlen=2000)
-        self.learning_rate = 0.001
+        self.memory = deque(maxlen=10000)
+        # self.learning_rate = 0.001
+        self.learning_rate = 0.00025
         self.gamma = 0.95
         self.exploration_rate = 1.0
-        self.exploration_min = 0.01
-        self.exploration_decay = 0.997
+        self.exploration_min = 0.1
+        self.exploration_decay = 0.9997
         self.network = self._build_model()
 
         self.network.summary()
@@ -33,6 +34,18 @@ class Agent:
                 self.exploration_rate = self.exploration_min
 
     def _build_model(self):
+        """Builds a neural network for DQN to use."""
+        model = Sequential()
+        model.add(Conv2D(8, (3, 3), activation='relu', input_shape=(self.state_size[0], self.state_size[1], 1)))
+        model.add(Conv2D(16, (3, 3), activation='relu'))
+        model.add(Conv2D(32, (4, 4), activation='relu'))
+        model.add(Flatten())
+        model.add(Dense(256, activation='relu'))
+        model.add(Dense(self.action_size, activation='linear'))
+        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
+        return model
+
+    def _build_model_old(self):
         """Builds a neural network for DQN to use."""
         model = Sequential()
         model.add(Conv2D(8, (3, 3), activation='relu', input_shape=(self.state_size[0], self.state_size[1], 1)))
@@ -57,8 +70,12 @@ class Agent:
         """Saves the model weights to the path set in the object."""
         self.network.save(self.weight_backup)
 
+    def save_model_snapshot(self, episode_id, reward):
+        """Saves model weights and encodes the file name parametrized by the episode id and reward."""
+        self.network.save(f'episode_{episode_id}_score_{reward}_{self.weight_backup}')
+
     def load_model(self):
-        """LOads the model weights from the path set in the object."""
+        """Loads the model weights from the path set in the object."""
         self.network.load_weights(self.weight_backup)
 
     def act(self, state):
@@ -102,8 +119,10 @@ class Agent:
 class PacmanEnv:
     def __init__(self, cold_start):
         self.sample_batch_size = 32
-        self.episodes = 2000
+        self.episodes = 6000
         self.env = Environment()
+
+        self.number_of_snapshots = 10
 
         self.state_size = self.env.getStateShape()
         self.action_size = self.env.getActionSize()
@@ -135,9 +154,12 @@ class PacmanEnv:
 
     def run_train(self):
         scores = []
+
         for index_episode in range(self.episodes):
             state = self.env.reset()
             state = self._preprocess_state(state)
+
+            snapshot_step = self.episodes // self.number_of_snapshots
 
             done = False
             index = 0
@@ -161,6 +183,11 @@ class PacmanEnv:
             print(f'Episode {index_episode + 1}/{self.episodes} Score: {reward} Exploration rate: {self.agent.exploration_rate}')
 
             scores.append(reward)
+
+            # Save if required
+            if index_episode % snapshot_step == 0:
+                print(f'Saving model of episode {index_episode}')
+                self.agent.save_model_snapshot(index_episode, reward)
 
             self.agent.learn(self.sample_batch_size)
 

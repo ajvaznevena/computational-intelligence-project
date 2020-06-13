@@ -1,4 +1,4 @@
-from algorithms.rl.reinforcement_learning import Environment
+from algorithms.rl.pacman_environment import Environment
 from grid.get_grid import get_grid
 
 import numpy as np

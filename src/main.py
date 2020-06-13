@@ -1,4 +1,6 @@
+from algorithms.rl.pacman_environment import Environment
 from game_config import *
+from game_state import stateTransformer
 from key_input import checkInput
 
 

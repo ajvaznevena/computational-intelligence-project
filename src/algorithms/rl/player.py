@@ -53,17 +53,17 @@ class Player:
                 if dot.dotType == 1:
                     self.score += 10
                     dots.remove(dot)
-                    return False
-                    # return REGULAR_PILL_REWARD
+                    # return False
+                    return REGULAR_PILL_REWARD
 
                 elif dot.dotType == 2:
                     self.score += 50
                     dot.eaten = True
-                    return True
-                    # return BIG_PILL_REWARD
+                    # return True
+                    return BIG_PILL_REWARD
 
-        # return 0
-        return False
+        return -1
+        # return False
 
     def eatGhost(self, ghosts, chasing):
         if not chasing:
