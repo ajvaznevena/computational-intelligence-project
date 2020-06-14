@@ -1,4 +1,4 @@
-from algorithms.rl.grid_config import *
+from algorithms.agents.grid_config import *
 from maps import checkMovePoint
 
 

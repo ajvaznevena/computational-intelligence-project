@@ -1,6 +1,8 @@
+from algorithms.agents.greedy_agent import GreedyAgent
+from algorithms.agents.tree_agent import TreeAgent
 from key_input import checkInput, playerMove
 from maps import checkMovePoint
-from algorithms.rl.dqn import Agent
+from algorithms.agents.dqn import Agent
 from game_state import stateTransformer
 from grid.get_grid import get_grid
 
@@ -27,7 +29,15 @@ class Player(Actor):
         self.died = False
 
         self.type = type
-        self.agent = Agent(np.array(get_grid()).shape, 4) if type == 'rl' else None
+
+        if type == 'rl':
+            self.agent = Agent(np.array(get_grid()).shape, 4)
+        elif type == 'greedy':
+            self.agent = GreedyAgent()
+        elif type == 'tree':
+            self.agent = TreeAgent()
+        else:
+            self.agent = None
 
     def getPlayerType(self):
         return self.type
@@ -78,6 +88,11 @@ class Player(Actor):
         self.eatAnimation = 0
         self.died = False
 
+        if self.type == 'greedy':
+            self.agent.path = []
+        elif self.type == 'tree':
+            self.agent = TreeAgent()
+
     def onGameRestart(self):
         self.restart()
         self.lives = 3
@@ -101,6 +116,19 @@ class Player(Actor):
                 elif self.type == 'rl':
                     state = stateTransformer(self, dots, ghosts, isChasingMode)
                     predicted_action = self.agent.act_best_action(state)
+
+                    print(f'Action: {Player.mapActionIndexToString(predicted_action)}')
+                    playerMove(self, predicted_action)
+
+                elif self.type == 'greedy':
+                    predicted_action = self.agent.actBestAction(self, dots)
+
+                    print(f'Action: {Player.mapActionIndexToString(predicted_action)}')
+                    playerMove(self, predicted_action)
+
+                elif self.type == 'tree':
+                    predicted_action = self.agent.actBestAction(self, ghosts, dots, isChasingMode)
+
                     print(f'Action: {Player.mapActionIndexToString(predicted_action)}')
                     playerMove(self, predicted_action)
 

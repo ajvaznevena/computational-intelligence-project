@@ -1,6 +1,7 @@
 import random
-from algorithms.ghost_interface import AlgorithmInterface, graph
-from algorithms.a_star import AStar
+from algorithms.algorithm_interface import AlgorithmInterface, graph
+from algorithms.help_functions import *
+from grid.get_grid import get_grid
 
 
 class GeneticAlgorithm(AlgorithmInterface):
@@ -53,17 +54,16 @@ class GeneticAlgorithm(AlgorithmInterface):
         child1.correctNonFeasible()
         child2.correctNonFeasible()
 
-
     def mutation(self, individual):
-        nodeName = AlgorithmInterface.getNodeName(individual.code)
+        nodeName = getNodeName(individual.code)
         if random.random() <= 0.05:
             neighbors = graph.get_neighbors(nodeName)
             neighborNameKey = random.choice(neighbors)[0]
-            individual.code = AlgorithmInterface.getCoordsFromName(neighborNameKey)
+            individual.code = getCoordsFromName(neighborNameKey)
 
     def getNextStep(self):
         bestIndividual = self.run()
-        return AlgorithmInterface.getNodeName(bestIndividual.code)
+        return getNodeName(bestIndividual.code)
 
 
 class Individual(AlgorithmInterface):
@@ -84,15 +84,15 @@ class Individual(AlgorithmInterface):
             self.code = (random.randrange(1, 30), random.randrange(0,29))       # ako sam opet ubola lose pozicije, pozovi opet
             self.correctNonFeasible()
 
-    def run(self):
+    def getNextStep(self):
         pass
 
     def fitnessFunction(self):
         # sto je manje rastojanje do pakmana, to je fitnes bolji
-        startNodeNameKey = AlgorithmInterface.getNodeName(self.code)
+        startNodeNameKey = getNodeName(self.code)
         goal = self.getGoal(self.ghost.index)
-        goalNameKey = self.getNodeName(goal)
-        return AStar.manhattan(startNodeNameKey, goalNameKey)
+        goalNameKey = getNodeName(goal)
+        return manhattanDistance(startNodeNameKey, goalNameKey)
 
     def getCode(self):
-        return AlgorithmInterface.pixelToGrid((self.ghost.x, self.ghost.y))
+        return pixelToGrid((self.ghost.x, self.ghost.y))

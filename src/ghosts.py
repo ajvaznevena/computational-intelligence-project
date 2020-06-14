@@ -1,6 +1,6 @@
 from algorithms.a_star import AStar
 from algorithms.genetic_algorithm import GeneticAlgorithm
-from algorithms.run_away import Frightened
+from algorithms.frightened_algorithm import Frightened
 
 from pgzero.builtins import Actor
 from pgzero.animation import animate

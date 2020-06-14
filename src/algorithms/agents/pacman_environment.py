@@ -1,8 +1,8 @@
 from grid.get_grid import get_grid
-from algorithms.rl.ghost import *
-from algorithms.rl.dots import *
-from algorithms.rl.player import Player
-from algorithms.run_away import Frightened
+from algorithms.agents.ghost import *
+from algorithms.agents.dots import *
+from algorithms.agents.player import Player
+from algorithms.frightened_algorithm import Frightened
 
 import numpy as np
 import random
