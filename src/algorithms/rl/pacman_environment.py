@@ -43,7 +43,6 @@ class Environment:
             1: self.player.moveDown,
             2: self.player.moveLeft,
             3: self.player.moveRight,
-            # 4: self.player.move
         }
 
         return self.grid
@@ -62,7 +61,7 @@ class Environment:
         for ghost in ghosts:
             i = int(ghost.y // CELL_SIZE)
             j = int(ghost.x // CELL_SIZE)
-            grid[i][j] = ghost.index + GHOST_ADD
+            grid[i][j] = ghost.index + GHOST_ADD_CODE
             grid[i][j] += GHOST_CODE_CHASE if chasing else 0
 
     def sample(self):
@@ -85,15 +84,10 @@ class Environment:
         self.actions.get(action)()
         if self.player.notValid:
             reward += NOT_VALID_MOVE_REWARD
-            self.player.notValid = False
 
         self.mapPlayerOnGrid(self.player, self.grid)
 
         eatPillReward = self.player.eatPill(self.dots)
-        # if eatPillReward:
-        #     self.chasing = True
-        # else:
-        #     reward += REGULAR_PILL_REWARD
         if eatPillReward == BIG_PILL_REWARD:
             self.chasing = True
 
@@ -105,19 +99,19 @@ class Environment:
 
         self.mapDotsOnGrid(self.dots, self.grid)
 
+        reward += self.player.eatGhost(self.ghosts, self.chasing)
+
         if self.chasing and self.chasingLast == 0:
             for ghost in self.ghosts:
                 ghost.path = []
                 ghost.algorithm = Frightened(ghost)
-
-        reward += self.player.eatGhost(self.ghosts, self.chasing)
 
         moveGhosts(self.ghosts)
         self.mapGhostsOnGrid(self.ghosts, self.grid, self.chasing)
 
         for ghost in self.ghosts:
             if self.player.caught(ghost):
-                reward += PLAYER_DEATH
+                reward += PLAYER_DEATH_REWARD
                 done = True
                 break
 

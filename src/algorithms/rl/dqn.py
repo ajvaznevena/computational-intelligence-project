@@ -3,7 +3,7 @@ import os
 import numpy as np
 from collections import deque
 from keras.models import Sequential
-from keras.layers import Dense, Conv2D, MaxPool2D, Flatten
+from keras.layers import Dense, Conv2D, Flatten
 from keras.optimizers import Adam
 import matplotlib.pyplot as plt
 
@@ -17,11 +17,10 @@ class Agent:
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=10000)
-        # self.learning_rate = 0.001
-        self.learning_rate = 0.00025
+        self.learning_rate = 0.00025    # old one was 0.001
         self.gamma = 0.95
         self.exploration_rate = 1.0
-        self.exploration_min = 0.1
+        self.exploration_min = 0.1      # old one was 0.01
         self.exploration_decay = 0.9997
         self.network = self._build_model()
 
@@ -30,6 +29,7 @@ class Agent:
         if not cold_start:
             if os.path.isfile(self.weight_backup):
                 print(f'Loading model from {self.weight_backup}')
+
                 self.load_model()
                 self.exploration_rate = self.exploration_min
 
@@ -38,30 +38,9 @@ class Agent:
         model = Sequential()
         model.add(Conv2D(8, (3, 3), activation='relu', input_shape=(self.state_size[0], self.state_size[1], 1)))
         model.add(Conv2D(16, (3, 3), activation='relu'))
-        model.add(Conv2D(32, (4, 4), activation='relu'))
+        model.add(Conv2D(32, (4, 4), activation='relu'))    # old one used (3, 3) kernel
         model.add(Flatten())
         model.add(Dense(256, activation='relu'))
-        model.add(Dense(self.action_size, activation='linear'))
-        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
-        return model
-
-    def _build_model_old(self):
-        """Builds a neural network for DQN to use."""
-        model = Sequential()
-        model.add(Conv2D(8, (3, 3), activation='relu', input_shape=(self.state_size[0], self.state_size[1], 1)))
-        model.add(Conv2D(16, (3, 3), activation='relu'))
-        model.add(Conv2D(32, (3, 3), activation='relu'))
-        model.add(Flatten())
-        model.add(Dense(256, activation='relu'))
-        model.add(Dense(self.action_size, activation='linear'))
-        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
-        return model
-
-    def _build_model_backup(self):
-        """Builds a neural network for DQN to use."""
-        model = Sequential()
-        model.add(Dense(24, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(24, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model
@@ -82,6 +61,7 @@ class Agent:
         """Acts according to epsilon greedy policy."""
         if np.random.rand() <= self.exploration_rate:
             return random.randrange(self.action_size)
+
         act_values = self.network.predict(state)
         return np.argmax(act_values[0])
 
@@ -104,6 +84,7 @@ class Agent:
     def learn(self, sample_batch_size):
         if len(self.memory) < sample_batch_size:
             return
+
         sample_batch = random.sample(self.memory, sample_batch_size)
         for state, action, reward, next_state, done in sample_batch:
             target = reward
@@ -112,6 +93,7 @@ class Agent:
             target_f = self.network.predict(state)
             target_f[0][action] = target
             self.network.fit(state, target_f, epochs=1, verbose=0)
+
         if self.exploration_rate > self.exploration_min:
             self.exploration_rate *= self.exploration_decay
 
@@ -150,6 +132,7 @@ class PacmanEnv:
             state = next_state
             index += 1
             # self.env.renderState()
+
         print(f'Score: {reward} steps={index}')
 
     def run_train(self):
@@ -165,14 +148,10 @@ class PacmanEnv:
             index = 0
             reward = 0
             while not done:
-                # self.env.render()
-
                 action = self.agent.act(state)
 
                 next_state, r, done = self.env.step(action)
                 next_state = self._preprocess_state(next_state)
-
-                # next_state = np.reshape(next_state, [1, self.state_size])
 
                 self.agent.remember(state, action, r, next_state, done)
                 state = next_state
@@ -190,12 +169,6 @@ class PacmanEnv:
                 self.agent.save_model_snapshot(index_episode, reward)
 
             self.agent.learn(self.sample_batch_size)
-
-            # if index_episode > 10:
-            #     last_10 = scores[-10:]
-            #     avg = sum(last_10) / 10
-            #     if avg > 490:
-            #         break
 
         self.agent.save_model()
 

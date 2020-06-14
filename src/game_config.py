@@ -9,7 +9,7 @@ from ghosts import initGhosts, moveGhosts, initGhostAlgorithm
 WIDTH = 600
 HEIGHT = 580
 
-player = Player('pacman_eat', 'rl')
+player = Player('pacman_eat', 'human')
 dots = initDots()  # list of all dots on screen
 ghosts = initGhosts()   # list of all four ghosts on screen
 

@@ -1,4 +1,5 @@
 from algorithms.ghost_interface import AlgorithmInterface, graph
+import sys
 
 
 class AStar(AlgorithmInterface):
@@ -12,7 +13,7 @@ class AStar(AlgorithmInterface):
         start = self.pixelToGrid((self.ghost.x, self.ghost.y))
         startNameKey = self.getNodeName(start)
 
-        goal = self.get_goal(self.ghost.index)
+        goal = self.getGoal(self.ghost.index)
         goalNameKey = self.getNodeName(goal)
 
         openset = set()
@@ -71,6 +72,9 @@ class AStar(AlgorithmInterface):
         return abs(vX - finishX) + abs(vY - finishY)
 
     def getNextStep(self):
+        goal = self.getGoal(self.ghost.index)
+        self.goalNameKey = self.getNodeName(goal)
+
         if self.ghost.path == [] or self.ghost.path[-1] != self.goalNameKey:
             path = self.run()
 

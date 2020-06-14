@@ -21,14 +21,16 @@ if __name__ == "__main__":
 # if __name__ == "__main__":
 #     env = Environment()
 #     g = env.reset()
-#     Environment.renderState(g)
+#     # Environment.renderState(g)
 #     while True:
 #         act = env.sample()
+#         # print(act)
 #
 #         n, rew, done1 = env.step(act)
-#         Environment.renderState(n)
+#         # Environment.renderState(n)
 #
-#         print(rew)
+#         # print(rew)
+#         # print()
 #
 #         if done1:
 #             break

@@ -90,7 +90,7 @@ class Individual(AlgorithmInterface):
     def fitnessFunction(self):
         # sto je manje rastojanje do pakmana, to je fitnes bolji
         startNodeNameKey = AlgorithmInterface.getNodeName(self.code)
-        goal = self.get_goal(self.ghost.index)
+        goal = self.getGoal(self.ghost.index)
         goalNameKey = self.getNodeName(goal)
         return AStar.manhattan(startNodeNameKey, goalNameKey)
 

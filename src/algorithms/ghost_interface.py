@@ -1,4 +1,3 @@
-import sys
 import random
 import numpy as np
 
@@ -23,7 +22,7 @@ class AlgorithmInterface(ABC):
     def getNextStep(self):
         pass
 
-    def get_goal(self, index):
+    def getGoal(self, index):
         # Red ghost's goal is player (index = 1)
         if index == 1:
             return self.pixelToGrid((self.player.x, self.player.y))
