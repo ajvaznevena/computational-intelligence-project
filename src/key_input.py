@@ -1,7 +1,7 @@
 from pygame import key
 from pygame.locals import *
 
-CELL_SIZE = 20
+from game_constants import CELL_SIZE
 
 
 def checkInput(player):

@@ -36,7 +36,7 @@ class GreedyAgent:
         closest = None
 
         for dot in dots:
-            if abs(player.x - dot.x) + abs(player.y - dot.y) < minDist:
+            if abs(player.x - dot.x) + abs(player.y - dot.y) <= minDist:
                 closest = dot
                 minDist = abs(player.x - dot.x) + abs(player.y - dot.y)
 

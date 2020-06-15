@@ -2,7 +2,7 @@ from algorithms.agents.greedy_agent import GreedyAgent
 from algorithms.agents.tree_agent import TreeAgent
 from key_input import checkInput, playerMove
 from maps import checkMovePoint
-from algorithms.agents.dqn import Agent
+# from algorithms.agents.dqn import Agent
 from game_state import stateTransformer
 from grid.get_grid import get_grid
 
@@ -37,7 +37,7 @@ class Player(Actor):
         elif type == 'tree':
             self.agent = TreeAgent()
         else:
-            self.agent = None
+            self.agent = None   # human is playing game
 
     def getPlayerType(self):
         return self.type
@@ -108,6 +108,7 @@ class Player(Actor):
         elif action == 4: return 'STAY'
 
     def update(self, dots, ghosts, isChasingMode):
+
         if self.gameStatus == 0:  # player is moving
             if self.inputEnabled:
                 if self.type == 'human':

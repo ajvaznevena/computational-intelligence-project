@@ -4,8 +4,8 @@ from maps import checkMovePoint
 
 class Player:
 
-    def __init__(self):
-        self.x, self.y = (WIDTH / 2 - CELL_SIZE / 2, 490)
+    def __init__(self, x = WIDTH / 2 - CELL_SIZE / 2, y = 490):
+        self.x, self.y = (x, y)
         self.movex, self.movey = (0, 0)
         self.angle = 0
         self.notValid = False

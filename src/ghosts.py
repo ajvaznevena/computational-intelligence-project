@@ -1,6 +1,7 @@
 from algorithms.a_star import AStar
 from algorithms.genetic_algorithm import GeneticAlgorithm
 from algorithms.frightened_algorithm import Frightened
+from game_constants import CELL_SIZE, HEIGHT
 
 from pgzero.builtins import Actor
 from pgzero.animation import animate
@@ -28,21 +29,23 @@ def initGhosts():
     ghosts = []
 
     for i in range(1, 5, 1):
-        ghost = Ghost(i, "ghost" + str(i), (270 + (i-1) * 20, 290), (i-1) * 3)
+        ghost = Ghost(i, "ghost" + str(i), (270 + (i-1) * 20, HEIGHT / 2), (i-1) * 3)
 
-        # tell random ghost to start search from upper left corner
+        # tell fourth ghost to start search from upper left corner
         if i == 3:
             ghost.path.append("n1_1")
+
         ghosts.append(ghost)
 
     return ghosts
 
 
 def moveGhosts(ghosts):
-    for ghost in ghosts:
 
-        # ghosts start chasing player each after few seconds
+    for ghost in ghosts:
+        # ghosts start chasing player after few seconds
         if time.time() - ghost.time >= ghost.seconds:
+
             # because all algorithms implement the same interface getNextStep can be called
             node = ghost.algorithm.getNextStep()
             if node is None:
@@ -50,21 +53,24 @@ def moveGhosts(ghosts):
 
             index = node.find('_')
 
-            animate(ghost, pos=(int(node[index + 1:]) * 20 + 10, int(node[1:index]) * 20 + 10),
+            animate(ghost, pos=(int(node[index + 1:]) * CELL_SIZE + CELL_SIZE / 2,
+                                int(node[1:index]) * CELL_SIZE + CELL_SIZE / 2),
                     duration=1 / 3, tween='linear')
 
 
-def initGhostAlgorithm(ghosts, player, algorithm):
+def initGhostsAlgorithm(ghosts, player, algorithm):
+    """ Inits algorithm, based on user input, which ghosts use to chase player"""
+
     for g in ghosts:
+        initGhostAlgorithm(g, player, algorithm)
 
-        if algorithm == 'A*':
-            g.setAlgorithm(AStar(g, player))
 
-        elif algorithm == 'GeneticAlgorithm':
-            g.setAlgorithm(GeneticAlgorithm(g, player))
+def initGhostAlgorithm(ghost, player, algorithm):
+    if algorithm == 'A*':
+        ghost.setAlgorithm(AStar(ghost, player))
 
-        elif algorithm == 'frightened':
-            g.setAlgorithm(Frightened(g))
+    elif algorithm == 'GeneticAlgorithm':
+        ghost.setAlgorithm(GeneticAlgorithm(ghost, player))
 
-        elif algorithm == 'A*_bot':
-            pass        # TODO
+    elif algorithm == 'Frightened':
+        ghost.setAlgorithm(Frightened(ghost))

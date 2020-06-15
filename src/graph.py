@@ -1,7 +1,5 @@
 from grid.get_grid import get_grid
 
-import numpy as np
-
 
 class Graph:
     def __init__(self, adjacency_list):
@@ -12,33 +10,37 @@ class Graph:
 
 
 def create_graph():
+    """ Creates graph from game grid """
+
     adjacency_list = get_adjacency_list()
     return Graph(adjacency_list)
 
 
-# list of node neighbours
 def get_adjacency_list():
+    """ Returns list of node neighbours """
+
     adjacency_list = {}
-    grid = np.array(get_grid(), copy=True)
+    grid = get_grid()
     rows, columns = grid.shape
 
     for i in range(rows):
         for j in range(columns):
-            if grid[i, j] == 0:
+            if grid[i, j] == 0:     # if move not available just continue
                 continue
 
             node_name = get_node_name(i, j)
             adjacency_list[node_name] = []
 
             # get all directions in which user can move and initialize its cost to 1
-            if grid[i-1, j]:    # i is never 0 so we are safe
+
+            if grid[i-1, j]:    # i is never 0 so i-1 is safe operation
                 adjacency_list[node_name].append((get_node_name(i-1, j), 1))
 
             if j > 0:
                 if grid[i, j-1]:
                     adjacency_list[node_name].append((get_node_name(i, j-1), 1))
 
-            if grid[i+1, j]:    # i is never row-1 so we are safe
+            if grid[i+1, j]:    # i is never row-1 so i+1 is safe operation
                 adjacency_list[node_name].append((get_node_name(i+1, j), 1))
 
             if j < columns-1:

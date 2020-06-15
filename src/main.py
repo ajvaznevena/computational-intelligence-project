@@ -1,8 +1,8 @@
-from algorithms.agents.pacman_environment import Environment
 from game_config import *
-from game_state import stateTransformer
+from ghosts import Ghost
 from key_input import checkInput
 import sys
+
 
 def draw():
 
@@ -41,7 +41,7 @@ def startFrightenedTimer():
         ghost.setImage("ghost5")
         ghost.path = []
 
-    initGhostAlgorithm(ghosts, player, 'frightened')
+    initGhostsAlgorithm(ghosts, player, 'Frightened')
 
     clock.schedule_unique(returnGhostsToNormal, 5.0)
 
@@ -55,7 +55,7 @@ def returnGhostsToNormal():
         ghost.setImage("ghost" + str(ghost.index))
         ghost.path = []
 
-    initGhostAlgorithm(ghosts, player, algorithm)
+    initGhostsAlgorithm(ghosts, player, algorithm)
 
 
 def drawCentreText(msg):
@@ -75,71 +75,81 @@ def drawText(msg, pos, fontsize=20):
 
 
 def update():
-    global ghostMovement  # to change global variable this statement is needed
-    global isChasingMode, ghosts
+    global ghostMovement, isChasingMode, ghosts, ghostsInitialized
 
-    # when player dies, reinitialize ghosts
+    # when player dies, reinitialize ghosts and wait for space press
     if player.gameStatus == 1:
-        ghosts = initGhosts()
-        initGhostAlgorithm(ghosts, player, algorithm)
+        if not ghostsInitialized:
+            ghosts = initGhosts()
+            initGhostsAlgorithm(ghosts, player, algorithm)
+            ghostsInitialized = True
+
         i = checkInput(player)
         if i == 1:
             player.restart()
 
-    if player.gameStatus == 2:
+    # when game is over or player won the game wait for space press
+    if player.gameStatus == 2 or player.gameStatus == 3:
         i = checkInput(player)
         if i == 1:
             restartGame()
 
+    # if player is human update game in every frame
     if player.getPlayerType() == 'human':
         player.update(dots, ghosts, isChasingMode)
 
-    # calculating dots
+    # calculate which dots are eaten
     for d in dots:
         if d.collidepoint((player.x, player.y)):
-            # sounds.pacman_eat.play()
             if d.dotType == 1:
+                sounds.pacman_eat.play()
                 player.score += 10
                 dots.remove(d)
             else:
+                sounds.pacman_eat_big.play()
                 player.score += 50
                 dots.remove(d)
                 startFrightenedTimer()
             break
 
+    # if all dots are eaten player won game
     if len(dots) == 0:
         player.gameStatus = 3
-        i = checkInput(player)
-        if i == 1:
-            restartGame()
 
+    # check if player is caught
     if not isChasingMode:
         for ghost in ghosts:
             if player.gameStatus == 0:
                 if player.caught(ghost, isChasingMode):
+                    sounds.pacman_death.play()
                     player.lives -= 1
                     player.gameStatus = 1
 
-    else:
-        for ghost in ghosts:
-            if player.caught(ghost, isChasingMode):
-                # sounds.pacman_eat_ghost.play()
-                player.score += 200
-                ghost.x = 290
-                ghost.y = 290
-                ghost.path = []
-
+    # if player lost all its lives game is over
     if player.lives == 0:
         player.gameStatus = 2
-        # sounds.pacman_death.play()
     else:
         ghostMovement += 1
-        if ghostMovement == ITER:
+        if ghostMovement == ITER:   # update in every ITER frame
             if player.gameStatus != 1:
                 moveGhosts(ghosts)
             if player.getPlayerType() != 'human':
                 player.update(dots, ghosts, isChasingMode)
             ghostMovement = 0
+
+    # check if any ghost is eaten
+    if isChasingMode:
+        for ghost in ghosts:
+            if player.caught(ghost, isChasingMode):
+                sounds.pacman_eat_ghost.play()
+                player.score += 200
+
+                ghosts.remove(ghost)
+                newGhost = Ghost(ghost.index, ghost.image,
+                                 (270 + (ghost.index-1) * 20, 290), 0)
+                initGhostAlgorithm(newGhost, player, algorithm)
+                ghosts.append(newGhost)
+                break
 
 
 def restartGame():
@@ -149,15 +159,15 @@ def restartGame():
     dots = initDots()
     ghosts = initGhosts()
     ghostMovement = 0
-    initGhostAlgorithm(ghosts, player, algorithm)
+    initGhostsAlgorithm(ghosts, player, algorithm)
 
 
 def init():
-    # music.play('background_music')
-    # music.set_volume(0.2)
+    music.play('background_music')
+    music.set_volume(0.2)
 
     # depending on which algorithm user selected ghosts algorithm is being initialised
-    initGhostAlgorithm(ghosts, player, algorithm)
+    initGhostsAlgorithm(ghosts, player, algorithm)
 
 
 algorithm = sys.argv[1]

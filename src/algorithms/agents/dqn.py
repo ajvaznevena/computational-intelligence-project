@@ -66,11 +66,7 @@ class Agent:
         return np.argmax(act_values[0])
 
     def act_best_action(self, state):
-        """
-        Act best  according to the learned policy.
-        :param state: A np based array of shape (29, 30, 1)
-        :return: Index of an action (0, 1, 2, 3, 4) that means that best action that agent thinks he/she can make.
-        """
+        """ Act best  according to the learned policy """
         act_values = self.network.predict(self.preprocess_state(state))
         return np.argmax(act_values[0])
 
@@ -115,25 +111,6 @@ class PacmanEnv:
 
     def load_model(self):
         self.agent.load_model()
-
-    def run_test(self):
-        state = self.env.reset()
-        state = self._preprocess_state(state)
-
-        # self.env.renderState()
-        done = False
-
-        index = 0
-        reward = 0
-        while not done:
-            action = self.agent.act(state)
-            next_state, reward, done = self.env.step(action)
-            next_state = self._preprocess_state(next_state)
-            state = next_state
-            index += 1
-            # self.env.renderState()
-
-        print(f'Score: {reward} steps={index}')
 
     def run_train(self):
         scores = []
