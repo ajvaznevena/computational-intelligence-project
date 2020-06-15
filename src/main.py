@@ -2,7 +2,7 @@ from algorithms.rl.pacman_environment import Environment
 from game_config import *
 from game_state import stateTransformer
 from key_input import checkInput
-
+import sys
 
 def draw():
 
@@ -122,7 +122,6 @@ def update():
 
     else:
         for ghost in ghosts:
-
             if player.caught(ghost, isChasingMode):
                 # sounds.pacman_eat_ghost.play()
                 player.score += 200
@@ -161,10 +160,6 @@ def init():
     initGhostAlgorithm(ghosts, player, algorithm)
 
 
-# TODO da ne smara svaki put, za sad imamo samo A* pa ne mora da se unosi :D
-algorithm = 'A*'
-# algorithm = 'gen'
-# algorithm = input("Enter which algorithm to use for ghosts: ")
-
+algorithm = sys.argv[1]
 init()
 pgzrun.go()

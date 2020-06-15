@@ -60,8 +60,11 @@ def initGhostAlgorithm(ghosts, player, algorithm):
         if algorithm == 'A*':
             g.setAlgorithm(AStar(g, player))
 
-        elif algorithm == 'gen':
+        elif algorithm == 'GeneticAlgorithm':
             g.setAlgorithm(GeneticAlgorithm(g, player))
 
         elif algorithm == 'frightened':
             g.setAlgorithm(Frightened(g))
+
+        elif algorithm == 'A*_bot':
+            pass        # TODO

@@ -1,6 +1,9 @@
 import random
-from algorithms.ghost_interface import AlgorithmInterface, graph
-from algorithms.a_star import AStar
+from src.algorithms.ghost_interface import AlgorithmInterface
+from src.algorithms.a_star import AStar
+from src.grid.get_grid import get_grid
+
+from src.algorithms.ghost_interface import graph
 
 
 class GeneticAlgorithm(AlgorithmInterface):
@@ -21,19 +24,21 @@ class GeneticAlgorithm(AlgorithmInterface):
             newPopulation.append(Individual(self.ghost, self.player))
 
         for iteration in range(self.max_iter):
-            # print(self.ghost.index, iteration)
             population.sort()
             for i in range(self.eliteSize):
                 newPopulation[i] = population[i]
             for i in range(self.eliteSize, self.populationSize, 2):
                 k1 = self.selection(population)
                 k2 = self.selection(population)
+
                 # self.crossover(population[k1], population[k2], newPopulation[i], newPopulation[i + 1])
+
                 self.mutation(newPopulation[i])
                 self.mutation(newPopulation[i + 1])
 
                 newPopulation[i].fitness = newPopulation[i].fitnessFunction()
                 newPopulation[i + 1].fitness = newPopulation[i + 1].fitnessFunction()
+
             population = newPopulation
         return population[0]
 
@@ -67,6 +72,7 @@ class GeneticAlgorithm(AlgorithmInterface):
 
 
 class Individual(AlgorithmInterface):
+
     def __init__(self, ghost, player):
         super().__init__()
         self.ghost = ghost
@@ -84,15 +90,15 @@ class Individual(AlgorithmInterface):
             self.code = (random.randrange(1, 30), random.randrange(0,29))       # ako sam opet ubola lose pozicije, pozovi opet
             self.correctNonFeasible()
 
-    def run(self):
-        pass
-
     def fitnessFunction(self):
         # sto je manje rastojanje do pakmana, to je fitnes bolji
         startNodeNameKey = AlgorithmInterface.getNodeName(self.code)
         goal = self.getGoal(self.ghost.index)
-        goalNameKey = self.getNodeName(goal)
+        goalNameKey = AlgorithmInterface.getNodeName(goal)
         return AStar.manhattan(startNodeNameKey, goalNameKey)
 
     def getCode(self):
         return AlgorithmInterface.pixelToGrid((self.ghost.x, self.ghost.y))
+
+    def getNextStep(self):
+        return

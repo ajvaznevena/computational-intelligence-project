@@ -24,7 +24,6 @@ def initGhosts(player):
 
     for i in range(1, 5, 1):
         ghost = Ghost(270 + (i-1) * CELL_SIZE, HEIGHT / 2, i, (i-1) * THREE_SECS, player)
-
         if i == 3:
             ghost.path.append("n1_1")
         ghosts.append(ghost)
@@ -35,7 +34,9 @@ def initGhosts(player):
 def moveGhosts(ghosts):
     for ghost in ghosts:
         if ghost.time >= ghost.frames:
+            print("OK")
             node = ghost.algorithm.getNextStep()
+            print("OK2")
             if node is None:
                 return
 

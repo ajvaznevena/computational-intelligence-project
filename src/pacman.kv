@@ -1,0 +1,48 @@
+<DefineButtons>:
+
+    gen: gen
+    aStar: aStar
+    aStarBot: aStarBot
+
+    GridLayout:
+        cols:1
+        size: root.width, root.height
+        row_force_default: True
+        row_default_height: 150
+
+        Label:
+            text: "Please select an algorithm to play the game:"
+
+        GridLayout:
+            cols:2
+            Label:
+                text: "A*"
+            CheckBox:
+                group: "alg"
+                id: aStar
+                active: True
+                on_active: if self.active: root.color_sel = .7,.7,.9,1
+                size_hint_x: .20
+
+            Label:
+                text: "A* with bot"
+            CheckBox:
+                group: "alg"
+                id: aStarBot
+                on_active: if self.active: root.color_sel = .7,.7,.9,1
+                size_hint_x: .20
+
+            Label:
+                text: "Genetic algorithm"
+            CheckBox:
+                group: "alg"
+                id: gen
+                on_active: if self.active: root.color_sel = .7,.7,.9,1
+                size_hint_x: .20
+
+
+        Button:
+            text: "Play"
+            on_press: root.getValues()
+            size_hint: 0.3, 0.5
+            pos_hint: {"x": 0.5, "top": 1}
