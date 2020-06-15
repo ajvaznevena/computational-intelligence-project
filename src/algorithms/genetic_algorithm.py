@@ -1,9 +1,15 @@
 import random
+<<<<<<< HEAD
 from src.algorithms.ghost_interface import AlgorithmInterface
 from src.algorithms.a_star import AStar
 from src.grid.get_grid import get_grid
 
 from src.algorithms.ghost_interface import graph
+=======
+from algorithms.algorithm_interface import AlgorithmInterface, graph
+from algorithms.help_functions import *
+from grid.get_grid import get_grid
+>>>>>>> 65aade3603af24c81afdb1289d291bf0769c3632
 
 
 class GeneticAlgorithm(AlgorithmInterface):
@@ -58,17 +64,16 @@ class GeneticAlgorithm(AlgorithmInterface):
         child1.correctNonFeasible()
         child2.correctNonFeasible()
 
-
     def mutation(self, individual):
-        nodeName = AlgorithmInterface.getNodeName(individual.code)
+        nodeName = getNodeName(individual.code)
         if random.random() <= 0.05:
             neighbors = graph.get_neighbors(nodeName)
             neighborNameKey = random.choice(neighbors)[0]
-            individual.code = AlgorithmInterface.getCoordsFromName(neighborNameKey)
+            individual.code = getCoordsFromName(neighborNameKey)
 
     def getNextStep(self):
         bestIndividual = self.run()
-        return AlgorithmInterface.getNodeName(bestIndividual.code)
+        return getNodeName(bestIndividual.code)
 
 
 class Individual(AlgorithmInterface):
@@ -90,10 +95,17 @@ class Individual(AlgorithmInterface):
             self.code = (random.randrange(1, 30), random.randrange(0,29))       # ako sam opet ubola lose pozicije, pozovi opet
             self.correctNonFeasible()
 
+<<<<<<< HEAD
+=======
+    def getNextStep(self):
+        pass
+
+>>>>>>> 65aade3603af24c81afdb1289d291bf0769c3632
     def fitnessFunction(self):
         # sto je manje rastojanje do pakmana, to je fitnes bolji
-        startNodeNameKey = AlgorithmInterface.getNodeName(self.code)
+        startNodeNameKey = getNodeName(self.code)
         goal = self.getGoal(self.ghost.index)
+<<<<<<< HEAD
         goalNameKey = AlgorithmInterface.getNodeName(goal)
         return AStar.manhattan(startNodeNameKey, goalNameKey)
 
@@ -102,3 +114,10 @@ class Individual(AlgorithmInterface):
 
     def getNextStep(self):
         return
+=======
+        goalNameKey = getNodeName(goal)
+        return manhattanDistance(startNodeNameKey, goalNameKey)
+
+    def getCode(self):
+        return pixelToGrid((self.ghost.x, self.ghost.y))
+>>>>>>> 65aade3603af24c81afdb1289d291bf0769c3632

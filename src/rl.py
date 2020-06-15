@@ -1,4 +1,4 @@
-from algorithms.rl.pacman_environment import Environment
+from algorithms.agents.pacman_environment import Environment
 
 import random
 import os
@@ -8,7 +8,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 import matplotlib.pyplot as plt
-from algorithms.rl.dqn import PacmanEnv
+from algorithms.agents.dqn import PacmanEnv
 
 if __name__ == "__main__":
     pacman = PacmanEnv(True)

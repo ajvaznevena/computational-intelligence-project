@@ -7,7 +7,7 @@ from keras.layers import Dense, Conv2D, Flatten
 from keras.optimizers import Adam
 import matplotlib.pyplot as plt
 
-from algorithms.rl.pacman_environment import Environment
+from algorithms.agents.pacman_environment import Environment
 
 
 class Agent:
@@ -21,7 +21,7 @@ class Agent:
         self.gamma = 0.95
         self.exploration_rate = 1.0
         self.exploration_min = 0.1      # old one was 0.01
-        self.exploration_decay = 0.9997
+        self.exploration_decay = 0.99998
         self.network = self._build_model()
 
         self.network.summary()
@@ -101,10 +101,10 @@ class Agent:
 class PacmanEnv:
     def __init__(self, cold_start):
         self.sample_batch_size = 32
-        self.episodes = 6000
+        self.episodes = 100000
         self.env = Environment()
 
-        self.number_of_snapshots = 10
+        self.number_of_snapshots = 30
 
         self.state_size = self.env.getStateShape()
         self.action_size = self.env.getActionSize()

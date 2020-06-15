@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 
 from grid.get_grid import get_grid
 from graph import create_graph
+from algorithms.help_functions import *
 
 grid = np.array(get_grid(), copy=True)   # movement grid
 graph = create_graph()  # movement graph
@@ -14,6 +15,7 @@ class AlgorithmInterface(ABC):
 
     def __init__(self):
         self.goalNameKey = ""
+        self.player = None
 
     def run(self):
         pass
@@ -25,7 +27,7 @@ class AlgorithmInterface(ABC):
     def getGoal(self, index):
         # Red ghost's goal is player (index = 1)
         if index == 1:
-            return self.pixelToGrid((self.player.x, self.player.y))
+            return pixelToGrid((self.player.x, self.player.y))
 
         # Lightblue ghost's goal is 4 fields ahead of player's current position (index = 2)
         elif index == 2:
@@ -48,20 +50,20 @@ class AlgorithmInterface(ABC):
         else:
             targetY = -80 if self.player.movey < 0 else 80
 
-        gridX, gridY = self.pixelToGrid((self.player.x + targetX, self.player.y + targetY))
+        gridX, gridY = pixelToGrid((self.player.x + targetX, self.player.y + targetY))
 
         if 0 <= gridX < 29 and 0 <= gridY < 30:
             if grid[gridX, gridY]:
                 return gridX, gridY
 
-        return self.pixelToGrid((self.player.x, self.player.y))
+        return pixelToGrid((self.player.x, self.player.y))
 
     def orangeGoal(self):
         nodesNo = len(graph.adjacency_list)
         r = random.randrange(nodesNo)
 
         goal = list(graph.adjacency_list.keys())[r]
-        return self.getCoordsFromName(goal)
+        return getCoordsFromName(goal)
 
     def pinkGoal(self):
         targetX, targetY = 0, 0
@@ -72,27 +74,10 @@ class AlgorithmInterface(ABC):
         else:
             targetY = 160 if self.player.movey < 0 else -160
 
-        tarX, tarY = self.pixelToGrid((self.player.x + targetX, self.player.y + targetY))
+        tarX, tarY = pixelToGrid((self.player.x + targetX, self.player.y + targetY))
 
         if 0 <= tarX < 29 and 0 <= tarY < 30:
             if grid[tarX, tarY]:
                 return tarX, tarY
 
-        return self.pixelToGrid((self.player.x, self.player.y))
-
-    @staticmethod
-    def pixelToGrid(node):
-        # this is safe because player and ghosts only move on value 1 in grid
-        return int(node[1] // 20), int(node[0] // 20)
-
-    @staticmethod
-    def getNodeName(node):
-        return "n" + str(node[0]) + "_" + str(node[1])
-
-    @staticmethod
-    def getCoordsFromName(name):
-        index = name.find('_')
-        coordX = int(name[1:index])
-        coordY = int(name[index + 1:])
-
-        return coordX, coordY
+        return pixelToGrid((self.player.x, self.player.y))

@@ -1,4 +1,6 @@
-from algorithms.ghost_interface import AlgorithmInterface, graph
+from algorithms.algorithm_interface import AlgorithmInterface, graph
+from algorithms.help_functions import *
+
 import sys
 
 
@@ -10,11 +12,11 @@ class AStar(AlgorithmInterface):
         self.player = player
 
     def run(self):
-        start = self.pixelToGrid((self.ghost.x, self.ghost.y))
-        startNameKey = self.getNodeName(start)
+        start = pixelToGrid((self.ghost.x, self.ghost.y))
+        startNameKey = getNodeName(start)
 
         goal = self.getGoal(self.ghost.index)
-        goalNameKey = self.getNodeName(goal)
+        goalNameKey = getNodeName(goal)
 
         openset = set()
         openset.add(startNameKey)
@@ -64,16 +66,9 @@ class AStar(AlgorithmInterface):
         print("Path doesn't exist")
         return None
 
-    @staticmethod
-    def manhattan(v_coords, goal):
-        vX, vY = AlgorithmInterface.getCoordsFromName(v_coords)
-        finishX, finishY = AlgorithmInterface.getCoordsFromName(goal)
-
-        return abs(vX - finishX) + abs(vY - finishY)
-
     def getNextStep(self):
         goal = self.getGoal(self.ghost.index)
-        self.goalNameKey = self.getNodeName(goal)
+        self.goalNameKey = getNodeName(goal)
 
         if self.ghost.path == [] or self.ghost.path[-1] != self.goalNameKey:
             path = self.run()
@@ -92,3 +87,10 @@ class AStar(AlgorithmInterface):
             return None
         else:
             return self.ghost.path[0]
+
+    @staticmethod
+    def manhattan(v_coords, goal):
+        vX, vY = getCoordsFromName(v_coords)
+        finishX, finishY = getCoordsFromName(goal)
+
+        return abs(vX - finishX) + abs(vY - finishY)
