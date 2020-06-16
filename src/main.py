@@ -167,9 +167,11 @@ def init():
     music.set_volume(0.2)
 
     # depending on which algorithm user selected ghosts algorithm is being initialised
+    player.setPlayerType(playerType)
     initGhostsAlgorithm(ghosts, player, algorithm)
 
 
 algorithm = sys.argv[1]
+playerType = sys.argv[2] # Choose agent :). It can be: human, rl, greedy, tree
 init()
 pgzrun.go()

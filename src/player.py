@@ -13,7 +13,7 @@ import numpy as np
 
 class Player(Actor):
 
-    def __init__(self, img, type):
+    def __init__(self, img):
         super().__init__(img)
 
         self.pos = 290, 490
@@ -28,6 +28,13 @@ class Player(Actor):
         self.eatAnimation = 0
         self.died = False
 
+        self.type = ''
+        self.agent = None
+
+    def getPlayerType(self):
+        return self.type
+
+    def setPlayerType(self, type):
         self.type = type
 
         if type == 'rl':
@@ -38,9 +45,6 @@ class Player(Actor):
             self.agent = TreeAgent()
         else:
             self.agent = None   # human is playing game
-
-    def getPlayerType(self):
-        return self.type
 
     def inputEnable(self):
         self.movex = self.movey = 0

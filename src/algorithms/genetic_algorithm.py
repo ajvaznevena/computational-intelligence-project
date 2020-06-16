@@ -1,9 +1,10 @@
 import random
+import numpy as np
 
-from src.algorithms.a_star import AStar
 from algorithms.algorithm_interface import AlgorithmInterface, graph
 from algorithms.help_functions import *
 from grid.get_grid import get_grid
+from algorithms.help_functions import pixelToGrid, getNodeName, manhattanDistance
 
 
 class GeneticAlgorithm(AlgorithmInterface):
@@ -13,8 +14,8 @@ class GeneticAlgorithm(AlgorithmInterface):
         self.ghost = ghost
         self.player = player
         self.max_iter = 300
-        self.populationSize = 50
-        self.eliteSize = 16    # ~33% of population size
+        self.populationSize = 30
+        self.eliteSize = 4
 
     def run(self):
         population = []
@@ -31,7 +32,7 @@ class GeneticAlgorithm(AlgorithmInterface):
                 k1 = self.selection(population)
                 k2 = self.selection(population)
 
-                # self.crossover(population[k1], population[k2], newPopulation[i], newPopulation[i + 1])
+                self.crossover(population[k1], population[k2], newPopulation[i], newPopulation[i + 1])
 
                 self.mutation(newPopulation[i])
                 self.mutation(newPopulation[i + 1])
@@ -53,21 +54,18 @@ class GeneticAlgorithm(AlgorithmInterface):
         return k
 
     def crossover(self, parent1, parent2, child1, child2):
-        child1.code = (parent1.code[0], parent2.code[1])
-        child2.code = (parent2.code[0], parent1.code[1])
-        child1.correctNonFeasible()
-        child2.correctNonFeasible()
+        i = random.randrange(0, 3)
+        child1.code = parent1.code[0:i] + parent2.code[i:]
+        child2.code = parent2.code[0:i] + parent1.code[i:]
 
     def mutation(self, individual):
-        nodeName = getNodeName(individual.code)
         if random.random() <= 0.05:
-            neighbors = graph.get_neighbors(nodeName)
-            neighborNameKey = random.choice(neighbors)[0]
-            individual.code = getCoordsFromName(neighborNameKey)
+            place = random.randrange(0, 3)
+            individual.code[place] = random.randrange(0, 4)
 
     def getNextStep(self):
         bestIndividual = self.run()
-        return getNodeName(bestIndividual.code)
+        return bestIndividual.getNextStep()
 
 
 class Individual(AlgorithmInterface):
@@ -76,9 +74,9 @@ class Individual(AlgorithmInterface):
         super().__init__()
         self.ghost = ghost
         self.player = player
-        self.code = self.getCode()        # hromozom je trenutna pozicija
-        self.correctNonFeasible()
-        self.fitness = 600         # TODO odrediti najveci broj
+        self.code = self.getCode()        # chromosome is 5-step path
+        # self.correctNonFeasible()
+        self.fitness = float('Inf')
 
     def __lt__(self, other):
         return self.fitness < other.fitness
@@ -86,18 +84,37 @@ class Individual(AlgorithmInterface):
     def correctNonFeasible(self):
         grid = get_grid()
         if grid[self.code[0]][self.code[1]] == 0:
-            self.code = (random.randrange(1, 30), random.randrange(0,29))       # ako sam opet ubola lose pozicije, pozovi opet
+            self.code = (random.randrange(1, 28), random.randrange(0,30))
             self.correctNonFeasible()
 
     def getNextStep(self):
-        pass
+        ghostI, ghostJ = pixelToGrid((self.ghost.x, self.ghost.y))
+
+        if self.code[0] == 0:   # up
+            if ghostI != 0:
+                ghostI -= 1
+        elif self.code[0] == 1:     # down
+            if ghostI != 28:
+                ghostI += 1
+        elif self.code[0] == 2:     # right
+            if ghostJ != 0:
+                ghostJ -= 1
+        elif self.code[0] == 3:     # left
+            if ghostJ != 29:
+                ghostJ += 1
+
+        return getNodeName((ghostI, ghostJ))
 
     def fitnessFunction(self):
-        # sto je manje rastojanje do pakmana, to je fitnes bolji
-        startNodeNameKey = getNodeName(self.code)
+        # fitness is better when distance is closer
+        startNodeNameKey = getNodeName(pixelToGrid((self.ghost.x, self.ghost.y)))
         goal = self.getGoal(self.ghost.index)
         goalNameKey = getNodeName(goal)
+
         return manhattanDistance(startNodeNameKey, goalNameKey)
 
     def getCode(self):
-        return pixelToGrid((self.ghost.x, self.ghost.y))
+        x = []
+        for i in range(3):
+            x.append(random.randrange(0, 4))
+        return x

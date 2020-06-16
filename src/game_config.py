@@ -9,7 +9,7 @@ from game_constants import WIDTH, HEIGHT, CELL_SIZE
 
 TITLE = "Pac-Man game"
 
-player = Player('pacman_eat', 'tree')  # Choose agent :). It can be: human, rl, greedy, tree
+player = Player('pacman_eat')
 dots = initDots()       # list of all dots on screen
 ghosts = initGhosts()   # list of all four ghosts on screen
 

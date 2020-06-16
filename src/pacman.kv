@@ -1,48 +1,115 @@
 <DefineButtons>:
 
-    gen: gen
-    aStar: aStar
-    aStarBot: aStarBot
+    humanA: humanA
+    rl: rl
+    treeA: treeA
+    greedyA: greedyA
+    humanG: humanG
+    treeG: treeG
+    greedyG: greedyG
 
     GridLayout:
         cols:1
         size: root.width, root.height
-        row_force_default: True
-        row_default_height: 150
+        row_default_height: 50
 
         Label:
-            text: "Please select an algorithm to play the game:"
+            text: "Please select algorithms to play the game:"
 
         GridLayout:
             cols:2
+            row_force_default: True
+            row_default_height: 100
+
             Label:
                 text: "A*"
-            CheckBox:
-                group: "alg"
-                id: aStar
-                active: True
-                on_active: if self.active: root.color_sel = .7,.7,.9,1
-                size_hint_x: .20
+
+            GridLayout:
+                cols:2
+                CheckBox:
+                    group: "alg"
+                    id: humanA
+                    active: True
+                    on_active: if self.active: root.color_sel = .7,.7,.9,1
+                    size_hint_x: .20
+                Label:
+                    text: "Human"
+
+                CheckBox:
+                    group: "alg"
+                    id: rl
+                    on_active: if self.active: root.color_sel = .7,.7,.9,1
+                    size_hint_x: .20
+                Label:
+                    text: "Reinforcement learning"
+
+                CheckBox:
+                    group: "alg"
+                    id: treeA
+                    on_active: if self.active: root.color_sel = .7,.7,.9,1
+                    size_hint_x: .20
+                Label:
+                    text: "Tree Agent"
+
+                CheckBox:
+                    group: "alg"
+                    id: greedyA
+                    on_active: if self.active: root.color_sel = .7,.7,.9,1
+                    size_hint_x: .20
+                Label:
+                    text: "Greedy Agent"
+
+
+        GridLayout:
+            cols:2
+            row_force_default: True
+            row_default_height: 100
 
             Label:
-                text: "A* with bot"
-            CheckBox:
-                group: "alg"
-                id: aStarBot
-                on_active: if self.active: root.color_sel = .7,.7,.9,1
-                size_hint_x: .20
+                text: "Genetic Algorithm"
 
-            Label:
-                text: "Genetic algorithm"
-            CheckBox:
-                group: "alg"
-                id: gen
-                on_active: if self.active: root.color_sel = .7,.7,.9,1
-                size_hint_x: .20
+            GridLayout:
+                cols:2
+                CheckBox:
+                    group: "alg"
+                    id: humanG
+                    on_active: if self.active: root.color_sel = .7,.7,.9,1
+                    size_hint_x: .20
+                Label:
+                    text: "Human"
+
+                CheckBox:
+                    group: "alg"
+                    id: treeG
+                    on_active: if self.active: root.color_sel = .7,.7,.9,1
+                    size_hint_x: .20
+                Label:
+                    text: "Tree Agent"
+
+                CheckBox:
+                    group: "alg"
+                    id: greedyG
+                    on_active: if self.active: root.color_sel = .7,.7,.9,1
+                    size_hint_x: .20
+                Label:
+                    text: "Greedy Agent"
 
 
-        Button:
-            text: "Play"
-            on_press: root.getValues()
-            size_hint: 0.3, 0.5
-            pos_hint: {"x": 0.5, "top": 1}
+
+        GridLayout:
+            cols:2
+            row_force_default: True
+            row_default_height: 50
+
+
+            Button:
+                text: "Play"
+                on_press: root.getValues()
+                size_hint: 0.3, 0.5
+                pos_hint: {"x": 0.5, "top": 1}
+            Button:
+                text: "Help"
+                on_press: root.helpBtn()
+                size_hint: 0.3, 0.5
+                pos_hint: {"x": 1, "top": 1}
+
