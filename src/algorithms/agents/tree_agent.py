@@ -100,7 +100,6 @@ class ChaseGhost(Node):
     def run(self, player, ghosts, dots, chasing):
         """ Chase closest ghost """
 
-        print('CHASE GHOST!')
         minDist = float('Inf')
         closestGhost = None
 
@@ -128,7 +127,6 @@ class AvoidGhost(Node):
     #     self.path = []
 
     def run(self, player, ghosts, dots, chasing):
-        print('RUN')
 
         # using quadrants tactics
         # minDist = float('Inf')
@@ -285,7 +283,6 @@ class EatPill(Node):
         self.path = []
 
     def run(self, player, ghosts, dots, chasing):
-        print('EAT PILL')
 
         dot = EatPill.closestPill(player, dots)
         dotName = getNodeName(pixelToGrid((dot.x, dot.y)))
