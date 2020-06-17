@@ -23,7 +23,7 @@ class DefineButtons(Widget):
     humanG = ObjectProperty(None)
     treeG = ObjectProperty(None)
     greedyG = ObjectProperty(None)
-    dfs = ObjectProperty(None)
+    # dfs = ObjectProperty(None)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -52,9 +52,9 @@ class DefineButtons(Widget):
         elif self.greedyG.active:
             self.selectedAlgorithm = "GeneticAlgorithm"
             self.playerAlgorithm = "greedy"
-        elif self.dfs.active:
-            self.selectedAlgorithm = "DFS"
-            self.playerAlgorithm = "human"
+        # elif self.dfs.active:
+        #     self.selectedAlgorithm = "DFS"
+        #     self.playerAlgorithm = "human"
 
         self.startPacman()
 

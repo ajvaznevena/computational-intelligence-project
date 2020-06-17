@@ -71,8 +71,8 @@ def initGhostAlgorithm(ghost, player, algorithm):
     if algorithm == 'A*':
         ghost.setAlgorithm(AStar(ghost, player))
 
-    elif algorithm == 'DFS':
-        ghost.setAlgorithm(Dfs(ghost, player))
+    # elif algorithm == 'DFS':
+    #     ghost.setAlgorithm(Dfs(ghost, player))
 
     elif algorithm == 'GeneticAlgorithm':
         ghost.setAlgorithm(GeneticAlgorithm(ghost, player))

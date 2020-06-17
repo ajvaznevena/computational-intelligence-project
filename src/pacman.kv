@@ -7,7 +7,7 @@
     humanG: humanG
     treeG: treeG
     greedyG: greedyG
-    dfs: dfs
+    # dfs: dfs
 
     GridLayout:
         cols:1
@@ -98,19 +98,19 @@
                     text: "Greedy Agent"
 
 
-        GridLayout:
-            cols: 2
-            Label:
-                text: "DFS"
-            GridLayout:
-                cols:2
-                CheckBox:
-                    group: "alg"
-                    id: dfs
-                    on_active: if self.active: root.color_sel = .7,.7,.9,1
-                    size_hint_x: .20
-                Label:
-                    text: "Human"
+        # GridLayout:
+        #    cols: 2
+        #    Label:
+        #        text: "DFS"
+        #    GridLayout:
+        #        cols:2
+        #        CheckBox:
+        #            group: "alg"
+        #            id: dfs
+        #            on_active: if self.active: root.color_sel = .7,.7,.9,1
+        #            size_hint_x: .20
+        #        Label:
+        #            text: "Human"
 
 
         GridLayout:
