@@ -7,7 +7,7 @@ from algorithms.agents.grid_config import WIDTH, HEIGHT
 from algorithms.agents.ghost import moveGhosts
 from graph import create_graph
 
-MIN_DIST = 5
+MIN_DIST = 7
 NUM_OF_STEPS = 4
 
 
@@ -123,6 +123,9 @@ class ChaseGhost(Node):
 
 
 class AvoidGhost(Node):
+
+    # def __init__(self):
+    #     self.path = []
 
     def run(self, player, ghosts, dots, chasing):
         print('RUN')

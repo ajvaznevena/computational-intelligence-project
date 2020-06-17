@@ -41,7 +41,8 @@ def startFrightenedTimer():
         ghost.setImage("ghost5")
         ghost.path = []
 
-    initGhostsAlgorithm(ghosts, player, 'Frightened')
+    if algorithm != 'GeneticAlgorithm':
+        initGhostsAlgorithm(ghosts, player, 'Frightened')
 
     clock.schedule_unique(returnGhostsToNormal, 5.0)
 
@@ -87,6 +88,7 @@ def update():
         i = checkInput(player)
         if i == 1:
             player.restart()
+            ghostsInitialized = False
 
     # when game is over or player won the game wait for space press
     if player.gameStatus == 2 or player.gameStatus == 3:

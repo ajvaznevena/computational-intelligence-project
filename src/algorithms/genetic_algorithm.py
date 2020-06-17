@@ -1,7 +1,6 @@
 import random
-import numpy as np
 
-from algorithms.algorithm_interface import AlgorithmInterface, graph
+from algorithms.algorithm_interface import AlgorithmInterface
 from algorithms.help_functions import *
 from grid.get_grid import get_grid
 from algorithms.help_functions import pixelToGrid, getNodeName, manhattanDistance
@@ -13,7 +12,7 @@ class GeneticAlgorithm(AlgorithmInterface):
         super().__init__()
         self.ghost = ghost
         self.player = player
-        self.max_iter = 300
+        self.max_iter = 50
         self.populationSize = 30
         self.eliteSize = 4
 
@@ -74,18 +73,11 @@ class Individual(AlgorithmInterface):
         super().__init__()
         self.ghost = ghost
         self.player = player
-        self.code = self.getCode()        # chromosome is 5-step path
-        # self.correctNonFeasible()
+        self.code = self.getCode()        # chromosome is 3-step path
         self.fitness = float('Inf')
 
     def __lt__(self, other):
         return self.fitness < other.fitness
-
-    def correctNonFeasible(self):
-        grid = get_grid()
-        if grid[self.code[0]][self.code[1]] == 0:
-            self.code = (random.randrange(1, 28), random.randrange(0,30))
-            self.correctNonFeasible()
 
     def getNextStep(self):
         ghostI, ghostJ = pixelToGrid((self.ghost.x, self.ghost.y))
@@ -105,16 +97,37 @@ class Individual(AlgorithmInterface):
 
         return getNodeName((ghostI, ghostJ))
 
+    def getLastNode(self):
+        grid = get_grid()
+
+        ghostI, ghostJ = pixelToGrid((self.ghost.x, self.ghost.y))
+
+        for action in self.code:
+            if action == 0:  # up
+                if ghostI != 0:
+                    ghostI -= 1
+            elif action == 1:  # down
+                if ghostI != 28:
+                    ghostI += 1
+            elif action == 2:  # right
+                if ghostJ != 0:
+                    ghostJ -= 1
+            elif action == 3:  # left
+                if ghostJ != 29:
+                    ghostJ += 1
+
+        return getNodeName((ghostI, ghostJ))
+
     def fitnessFunction(self):
         # fitness is better when distance is closer
-        startNodeNameKey = getNodeName(pixelToGrid((self.ghost.x, self.ghost.y)))
+        startNodeNameKey = getNodeName(getCoordsFromName(self.getLastNode()))
         goal = self.getGoal(self.ghost.index)
         goalNameKey = getNodeName(goal)
 
         return manhattanDistance(startNodeNameKey, goalNameKey)
 
     def getCode(self):
-        x = []
+        code = []
         for i in range(3):
-            x.append(random.randrange(0, 4))
-        return x
+            code.append(random.randrange(0, 4))
+        return code
