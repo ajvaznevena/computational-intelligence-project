@@ -7,6 +7,7 @@
     humanG: humanG
     treeG: treeG
     greedyG: greedyG
+    dfs: dfs
 
     GridLayout:
         cols:1
@@ -15,6 +16,8 @@
 
         Label:
             text: "Please select algorithms to play the game:"
+            pos_hint: {"x": 0.2, "top": 1}
+            color: 217, 76, 59, 1
 
         GridLayout:
             cols:2
@@ -95,9 +98,23 @@
                     text: "Greedy Agent"
 
 
+        GridLayout:
+            cols: 2
+            Label:
+                text: "DFS"
+            GridLayout:
+                cols:2
+                CheckBox:
+                    group: "alg"
+                    id: dfs
+                    on_active: if self.active: root.color_sel = .7,.7,.9,1
+                    size_hint_x: .20
+                Label:
+                    text: "Human"
+
 
         GridLayout:
-            cols:2
+            cols: 2
             row_force_default: True
             row_default_height: 50
 
@@ -109,7 +126,22 @@
                 pos_hint: {"x": 0.5, "top": 1}
             Button:
                 text: "Help"
-                on_press: root.helpBtn()
+                on_press: root.helpBtnPressed()
                 size_hint: 0.3, 0.5
                 pos_hint: {"x": 1, "top": 1}
 
+
+<Help>:
+    Label:
+        text: "Welcome to our Help center!"
+        pos_hint: {"x":0, "y":0.4}
+        color: 217, 76, 59, 1
+    Label:
+        text: "You can choose between A* algorithm and"
+        pos_hint: {"x": -0.105, "y": 0.2}
+    Label:
+        text: "Genetic algorithm to be played by you or by"
+        pos_hint: {"x": -0.1, "y": 0.1}
+    Label:
+        text: "some agents by clicking on radio button."
+        pos_hint: {"x": -0.12, "y": 0}

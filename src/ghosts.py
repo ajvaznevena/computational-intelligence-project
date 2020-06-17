@@ -2,10 +2,12 @@ from algorithms.a_star import AStar
 from algorithms.genetic_algorithm import GeneticAlgorithm
 from algorithms.frightened_algorithm import Frightened
 from game_constants import CELL_SIZE, HEIGHT
+from algorithms.dfs import Dfs
 
 from pgzero.builtins import Actor
 from pgzero.animation import animate
 import time
+
 
 
 class Ghost(Actor):
@@ -68,6 +70,9 @@ def initGhostsAlgorithm(ghosts, player, algorithm):
 def initGhostAlgorithm(ghost, player, algorithm):
     if algorithm == 'A*':
         ghost.setAlgorithm(AStar(ghost, player))
+
+    elif algorithm == 'DFS':
+        ghost.setAlgorithm(Dfs(ghost, player))
 
     elif algorithm == 'GeneticAlgorithm':
         ghost.setAlgorithm(GeneticAlgorithm(ghost, player))
