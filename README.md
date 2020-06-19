@@ -35,4 +35,4 @@
 ## Autori:
 
 - Olivera Popović 64/2016,  [popovic-olivera](https://github.com/popovic-olivera)
-- Nevena Ajvaz 289/2015,  [ajvaznevena](https://https://github.com/ajvaznevena)
+- Nevena Ajvaz 289/2015,  [ajvaznevena](https://github.com/ajvaznevena)
